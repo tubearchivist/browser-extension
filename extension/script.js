@@ -6,12 +6,6 @@ console.log("running script.js");
 
 let browserType = getBrowser();
 
-setTimeout(function(){
-    console.log("running setimeout")
-    sendUrl();
-    return false;
-}, 2000);
-
 
 // boilerplate to dedect browser type api
 function getBrowser() {
@@ -45,3 +39,12 @@ function sendUrl() {
     });
 
 };
+
+
+document.addEventListener("yt-navigate-finish", function (event) {
+    console.log("running setimeout")
+    setTimeout(function(){
+        sendUrl();
+        return false;
+    }, 2000);
+});
