@@ -25,6 +25,9 @@
         #download {
             text-align: center
         }
+        #status-icon {
+            font-size: 1.5em;
+        }
         .login-form {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -33,9 +36,14 @@
         .login-form input {
             margin: 3px 0;
         }
-        .submit button {
-            margin: 10px auto 15px auto;
-            display: block;
+        .submit {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .submit button,
+        .youtube-page button {
+            margin: 10px;
             border-radius: 0;
             padding: 5px 13px;
             border: none;
@@ -43,7 +51,8 @@
             background-color: #259485;
             color: #ffffff;
         }
-        .submit button:hover {
+        .submit button:hover,
+        .youtube-page button:hover {
             background-color: #97d4c8;
             transform: scale(1.05);
             color: #00202f;
@@ -62,7 +71,7 @@
     <div class="container">
         <img src="/images/logo.svg" alt="ta-logo">
         <hr>
-        <div id="download"></div>
+        <div class="youtube-page" id="download"></div>
         <form class="login-form">
             <label for="url">Tube Archivist Url:</label>
             <input type="text" id="url" name="url">
@@ -72,7 +81,7 @@
             <input type="password" id="api-key" name="api-key">
         </form>
         <div class="submit">
-            <button onclick="storeLogin()" id="save-login">Save</button>
+            <button onclick="storeLogin()" id="save-login">Save</button><span id="status-icon"></span>
         </div>
         <div class="icons">
             <div>

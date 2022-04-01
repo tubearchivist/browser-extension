@@ -36,6 +36,21 @@ document.getElementById("save-login").addEventListener("click", function () {
     });
 })
 
+
+function setStatusIcon(connected) {
+
+    let statusIcon = document.getElementById("status-icon")
+    if (connected == true) {
+        console.log("connected");
+    } else {
+        console.log("not connected");
+        statusIcon.innerHTML = "&#9746;";
+        statusIcon.style.color = "red";
+    }
+
+}
+
+
 // fill in form
 document.addEventListener("DOMContentLoaded", async () => {
 
@@ -44,6 +59,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     function onGot(item) {
         if (!item.access) {
             console.log("no access details found");
+            setStatusIcon(false);
             return
         }
         console.log(item.access);
