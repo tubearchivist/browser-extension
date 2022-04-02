@@ -7,6 +7,7 @@ This is a proof of concept with the following functionality:
 - Add a download button to the pop up for youtube links
 
 ## Test this extension
+Use the correct manifest file for your browser. Either rename the browser specific file to `manifest.json` before loading the addon or symlink it to the correct location, e.g. `ln -s manifest-firefox.json manifest.json`.
 - Firefox
   - Open `about:debugging#/runtime/this-firefox`
   - Click on *Load Temporary Add-on*
