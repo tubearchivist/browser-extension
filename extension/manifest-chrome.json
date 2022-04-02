@@ -1,0 +1,26 @@
+{
+    "manifest_version": 3,
+    "name": "TubeArchivist Companion",
+    "description": "Interact with your selhosted TA server.",
+    "version": "0.0.1",
+    "icons": {
+        "48": "/images/icon.png",
+        "128": "/images/icon128.png"
+    },
+    "action": {
+        "default_popup": "index.html"
+    },
+    "permissions": [
+        "storage",
+        "tabs"
+    ],
+    "content_scripts": [
+        {
+            "matches": ["https://www.youtube.com/*"],
+            "js": ["script.js"]
+        }
+    ],
+    "background": {
+        "service_worker": "background.js"
+    }
+}
