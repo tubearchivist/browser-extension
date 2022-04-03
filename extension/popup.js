@@ -90,6 +90,14 @@ document.getElementById("download").addEventListener("click", function () {
 
     function handleResponse(message) {
         console.log("popup.js response: " + JSON.stringify(message));
+        browserType.storage.local.remove("youtube").then(response => {
+            let download = document.getElementById("download");
+            download.innerHTML = ""
+            let message = document.createElement("p");
+            message.innerText = "Link sent to Tube Archivist"
+            download.appendChild(message)
+            download.appendChild(document.createElement("hr"));
+        })
     }
     
     function handleError(error) {
