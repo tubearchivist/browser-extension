@@ -1,4 +1,7 @@
 # Tube Archivist Companion
+
+![popup screenshot](assets/screenshot.png?raw=true "Tube Archivist Companion Popup") 
+
 A browser extension to directly add videos from YouTube to Tube Archivist.
 
 ## MVP or better *bearly viable product*
