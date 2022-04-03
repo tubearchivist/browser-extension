@@ -8,10 +8,8 @@ let browserType = getBrowser();
 function getBrowser() {
     if (typeof chrome !== "undefined") {
         if (typeof browser !== "undefined") {
-            console.log("detected firefox");
             return browser;
         } else {
-            console.log("detected chrome");
             return chrome;
         }
     } else {
@@ -20,9 +18,9 @@ function getBrowser() {
     };
 }
 
+
 // store access details
 document.getElementById("save-login").addEventListener("click", function () {
-    console.log("save form");
     let toStore = {
         "access": {
             "url": document.getElementById("url").value,
@@ -30,20 +28,49 @@ document.getElementById("save-login").addEventListener("click", function () {
             "apiKey": document.getElementById("api-key").value
         }
     };
-    console.log(toStore);
     browserType.storage.local.set(toStore, function() {
         console.log("Stored connection details: " + JSON.stringify(toStore));
+        pingBackend();
     });
 })
 
 
+// verify connection status
+document.getElementById("status-icon").addEventListener("click", function() {
+    pingBackend();
+})
+
+
+// send ping message to TA backend
+function pingBackend() {
+
+    function handleResponse(message) {
+        if (message.response === "pong") {
+            setStatusIcon(true);
+            console.log("connection validated")
+        }
+    }
+    
+    function handleError(error) {
+        console.log(`Error: ${error}`);
+        setStatusIcon(false);
+    }
+
+    console.log("ping TA server")
+    let sending = browserType.runtime.sendMessage({"verify": true});
+    sending.then(handleResponse, handleError);
+
+}
+
+
+// change status icon based on connection status
 function setStatusIcon(connected) {
 
     let statusIcon = document.getElementById("status-icon")
     if (connected == true) {
-        console.log("connected");
+        statusIcon.innerHTML = "&#9745;";
+        statusIcon.style.color = "green";
     } else {
-        console.log("not connected");
         statusIcon.innerHTML = "&#9746;";
         statusIcon.style.color = "red";
     }
@@ -51,10 +78,32 @@ function setStatusIcon(connected) {
 }
 
 
+// download link
+document.getElementById("download").addEventListener("click", function () {
+
+    let button = document.getElementById("downloadButton");
+    let payload = {
+        "download": {
+            "url": button.getAttribute("data-id")
+        }
+    };
+
+    function handleResponse(message) {
+        console.log("popup.js response: " + JSON.stringify(message));
+    }
+    
+    function handleError(error) {
+        console.log(`Error: ${error}`);
+    }
+
+    let sending = browserType.runtime.sendMessage(payload);
+    sending.then(handleResponse, handleError)
+
+})
+
+
 // fill in form
 document.addEventListener("DOMContentLoaded", async () => {
-
-    console.log("executing dom loader");
 
     function onGot(item) {
         if (!item.access) {
@@ -62,10 +111,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             setStatusIcon(false);
             return
         }
-        console.log(item.access);
         document.getElementById("url").value = item.access.url;
         document.getElementById("port").value = item.access.port;
         document.getElementById("api-key").value = item.access.apiKey;
+        pingBackend();
     };
     
     function onError(error) {
@@ -83,7 +132,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 })
 
 function downlodButton(result) {
-    console.log("running build dl button");
+
     let download = document.getElementById("download");
     let title = document.createElement("p");
     title.innerText = result.youtube.title;
@@ -93,17 +142,8 @@ function downlodButton(result) {
     button.id = "downloadButton";
     button.setAttribute("data-id", result.youtube.url);
 
-    button.addEventListener("click", function () {
-        console.log("send download message");
-        let payload = {
-            "download": {
-                "url": result.youtube.url
-            }
-        };
-        browserType.runtime.sendMessage(payload);
-    });
-
     download.appendChild(title);
     download.appendChild(button);
     download.appendChild(document.createElement("hr"));
+
 }

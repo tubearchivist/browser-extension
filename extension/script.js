@@ -2,8 +2,6 @@
 content script running on youtube.com
 */
 
-console.log("running script.js");
-
 let browserType = getBrowser();
 
 
@@ -25,7 +23,6 @@ function getBrowser() {
 
 
 function sendUrl() {
-    console.log("run sendUrl from script.js");
 
     let payload = {
         "youtube": {
@@ -33,7 +30,7 @@ function sendUrl() {
             "title": document.title
         }
     }
-    console.log(JSON.stringify(payload));
+    console.log("youtube link: " + JSON.stringify(payload));
     browserType.runtime.sendMessage(payload, function(response) {
         console.log(response.farewell);
     });
@@ -42,7 +39,6 @@ function sendUrl() {
 
 
 document.addEventListener("yt-navigate-finish", function (event) {
-    console.log("running setimeout")
     setTimeout(function(){
         sendUrl();
         return false;
