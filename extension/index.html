@@ -6,75 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TubeArchivist Companion</title>
     <link rel="stylesheet" href="https://fonts.googleapi.com/css?family=Sen" type="text/css">
-    <style>
-        body {
-            font-family: Sen-Regular, sans-serif;
-            background-color: #00202f;
-            color: #97d4c8;
-        }
-        .container {
-            padding: 10px;
-            min-width: 300px;
-            max-width: 400px;
-        }
-        hr {
-            height: 1px;
-            color: white;
-            background-color: white;
-            margin: 10px 0;
-        }
-        #download {
-            text-align: center
-        }
-        #status-icon {
-            font-size: 1.5em;
-        }
-        .logo img {
-            width: 100%;
-        }
-        .login-form {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-        }
-        .login-form label,
-        .login-form input {
-            margin: 3px 0;
-        }
-        .submit {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .submit button,
-        .youtube-page button {
-            margin: 10px;
-            border-radius: 0;
-            padding: 5px 13px;
-            border: none;
-            cursor: pointer;
-            background-color: #259485;
-            color: #ffffff;
-        }
-        .submit button:hover,
-        .youtube-page button:hover {
-            background-color: #97d4c8;
-            transform: scale(1.05);
-            color: #00202f;
-        }
-        .icons {
-            display: flex;
-            grid-template-columns: 1fr 1fr;
-            justify-content: space-between;
-        }
-        .icons img {
-            width: 25px;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <div class="logo">
             <img src="/images/logo.png" alt="ta-logo">
+            <span>v0.0.1</span>
         </div>
         <hr>
         <div class="youtube-page" id="download"></div>
