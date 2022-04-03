@@ -117,7 +117,7 @@ async function downloadLink(toDownload) {
 
 
 // event listener for messages from script.js and popup.js
-browser.runtime.onMessage.addListener(
+browserType.runtime.onMessage.addListener(
     (data, sender) => {
         console.log("message background.js listener: " + JSON.stringify(data))
         if (data.verify === true) {
