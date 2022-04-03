@@ -15,6 +15,7 @@
         .container {
             padding: 10px;
             min-width: 300px;
+            max-width: 400px;
         }
         hr {
             height: 1px;
@@ -27,6 +28,9 @@
         }
         #status-icon {
             font-size: 1.5em;
+        }
+        .logo img {
+            width: 100%;
         }
         .login-form {
             display: grid;
@@ -69,7 +73,9 @@
 </head>
 <body>
     <div class="container">
-        <img src="/images/logo.svg" alt="ta-logo">
+        <div class="logo">
+            <img src="/images/logo.png" alt="ta-logo">
+        </div>
         <hr>
         <div class="youtube-page" id="download"></div>
         <form class="login-form">
