@@ -134,7 +134,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     browserType.storage.local.get("youtube", function(result) {
-        downlodButton(result);
+        if (result.youtube) {
+            downlodButton(result);
+        }
     })
 
 })
