@@ -116,21 +116,25 @@ async function downloadLink(toDownload) {
 }
 
 
-// event listener for messages from script.js and popup.js
-browserType.runtime.onMessage.addListener(
-    (data, sender) => {
-        console.log("message background.js listener: " + JSON.stringify(data))
-        if (data.verify === true) {
-            let response = verifyConnection()
-            return Promise.resolve(response);
-        } else if (data.youtube) {
-            setYoutubeLink(data)
-        } else if (data.download) {
-            let response = downloadLink(data.download.url)
-            return Promise.resolve(response);
-        }
+// process and return message if needed
+function handleMessage(request, sender, sendResponse) {
+    console.log("message background.js listener: " + JSON.stringify(request));
 
-        return false;
-        
+    if (request.verify === true) {
+        let response = verifyConnection();
+        response.then(message => {
+            sendResponse(message);
+        })
+    } else if (request.youtube) {
+        setYoutubeLink(request)
+    } else if (request.download) {
+        let response = downloadLink(request.download.url);
+        response.then(message => {
+            sendResponse(message)
+        })
     }
-);
+
+    return true;
+}
+
+browserType.runtime.onMessage.addListener(handleMessage);
