@@ -5,8 +5,8 @@
 A browser extension to directly add videos from YouTube to Tube Archivist.
 
 ## Install
-- Firefox: The addon is available on the official [Extension store](https://addons.mozilla.org/addon/tubearchivist-companion/)
-- Chrome: Approval is pending, see below to *Test this extension*.
+- Firefox: The addon is available on the [Extension store](https://addons.mozilla.org/addon/tubearchivist-companion/).
+- Chrome: The addon is available on the [Chrome Web Store](https://chrome.google.com/webstore/detail/tubearchivist-companion/jjnkmicfnfojkkgobdfeieblocadmcie).
 
 ## Permissions
 - **Access your data for www.youtube.com**: Needed for the addon to know your current page on YouTube to send the link to Tube Archivist.
