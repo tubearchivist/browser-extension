@@ -115,6 +115,24 @@ async function downloadLink(toDownload) {
 
 }
 
+async function subscribeLink(toSubscribe) {
+
+    const path = "api/channel/";
+    let payload = {
+        "data": [
+            {
+                "channel_id": toSubscribe,
+                "channel_subscribed": true,
+            }
+        ]
+    }
+    let access = await getAccess();
+    let response = await sendPost(path, access, payload);
+
+    return response
+
+}
+
 
 // process and return message if needed
 function handleMessage(request, sender, sendResponse) {
@@ -129,6 +147,11 @@ function handleMessage(request, sender, sendResponse) {
         setYoutubeLink(request)
     } else if (request.download) {
         let response = downloadLink(request.download.url);
+        response.then(message => {
+            sendResponse(message)
+        })
+    } else if (request.subscribe) {
+        let response = subscribeLink(request.subscribe.url);
         response.then(message => {
             sendResponse(message)
         })
