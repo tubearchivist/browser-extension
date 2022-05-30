@@ -62,6 +62,12 @@ function pingBackend() {
 
 }
 
+// add url to image
+function addUrl(access) {
+    const url = `${access.url}:${access.port}`;
+    document.getElementById("ta-url").setAttribute("href", url);
+}
+
 
 // change status icon based on connection status
 function setStatusIcon(connected) {
@@ -153,6 +159,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById("port").value = item.access.port;
         document.getElementById("api-key").value = item.access.apiKey;
         pingBackend();
+        addUrl(item.access);
     };
     
     function onError(error) {
