@@ -182,6 +182,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 function createButtons(result) {
 
     let download = document.getElementById("download");
+    let linkType = document.createElement("h3");
+    linkType.innerText = result.youtube.type.charAt(0).toUpperCase() + result.youtube.type.slice(1);
     let title = document.createElement("p");
     title.innerText = result.youtube.title;
 
@@ -199,6 +201,7 @@ function createButtons(result) {
     subscribeButton.setAttribute("data-id", result.youtube.url);
     subscribeButton.addEventListener("click", function(){subscribeEvent()}, false);
 
+    download.appendChild(linkType);
     download.appendChild(title);
     download.appendChild(downloadButton);
     download.appendChild(subscribeButton);

@@ -8,6 +8,10 @@ body {
     min-width: 300px;
     max-width: 400px;
 }
+.h3 {
+    font-family: Sen-bold, sans-serif;
+    text-transform: capitalize;
+}
 hr {
     height: 1px;
     color: white;

@@ -22,12 +22,41 @@ function getBrowser() {
 }
 
 
+function detectUrlType(url) {
+
+    const videoRe = new RegExp(/^https:\/\/(www\.)?(youtube.com\/watch\?v=|youtu\.be\/)\w{11}/);
+    if (videoRe.test(url)) {
+        return "video"
+    }
+    const channelRe = new RegExp(/^https:?\/\/www\.?youtube.com\/c|channel|user\/\w+(\/|featured|videos)?$/);
+    if (channelRe.test(url)) {
+        return "channel"
+    }
+    const playlistRe = new RegExp(/^https:\/\/(www\.)?youtube.com\/playlist\?list=/);
+    if (playlistRe.test(url)) {
+        return "playlist"
+    }
+
+    return false
+
+}
+
+
 function sendUrl() {
+
+    let url = document.URL
+
+    let urlType = detectUrlType(url);
+    if (urlType == false) {
+        console.log("not relevant")
+        return
+    }
 
     let payload = {
         "youtube": {
-            "url": document.URL,
-            "title": document.title
+            "url": url,
+            "title": document.title,
+            "type": urlType,
         }
     }
     console.log("youtube link: " + JSON.stringify(payload));
