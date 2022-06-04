@@ -2,7 +2,7 @@
 
 ![popup screenshot](assets/screenshot.png?raw=true "Tube Archivist Companion Popup") 
 
-A browser extension to directly add videos from YouTube to Tube Archivist.
+A browser extension to bridge YouTube with your Tube Archivist service.
 
 ## Install
 - Firefox: The addon is available on the [Extension store](https://addons.mozilla.org/addon/tubearchivist-companion/).
@@ -19,10 +19,11 @@ A browser extension to directly add videos from YouTube to Tube Archivist.
 
 A green checkmark will appear next to the *Save* button if your connection is working.
 
-## MVP or better *bearly viable product*
-This is a proof of concept with the following functionality:
+## All great things start small
+This extension allows you to do the following:
 - Add your Tube Archivist connection details in the addon popup
-- Add a download button to the pop up for youtube links
+- Add a download button to the popup for YouTube links
+- Add a subscribe button to subscribe to channels and playlists
 
 ## Test this extension
 Use the correct manifest file for your browser. Either rename the browser specific file to `manifest.json` before loading the addon or symlink it to the correct location, e.g. `ln -s manifest-firefox.json manifest.json`.
@@ -36,8 +37,9 @@ Use the correct manifest file for your browser. Either rename the browser specif
   - Click on *Load unpacked*
   - Open the folder containing the *manifest.json* file.
 
-## Help needed
-This is only minimally useful in this state. Join us on our Discord and please help us improve that.
+## Compatibility
+- Verify that you are running the latest version of Tube Archivist as the API is under development and will change.
+- For testing this extension between releases, use the *unstable* builds of Tube Archivist, only for your tesing environment.
 
-## Note:
-- This requires Tube Archivist v0.1.4 or later.
+## Help needed
+Join us on [Discord](https://discord.gg/AFwz8nE7BK) and help us improve and extend this project.
