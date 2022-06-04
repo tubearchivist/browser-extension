@@ -38,7 +38,7 @@ function create_zip {
 function create_release {
 
     git tag -a "$VERSION" -m "new release version $VERSION"
-    git push all "$VERSION"
+    git push origin "$VERSION"
 
 }
 
