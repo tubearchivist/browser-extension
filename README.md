@@ -8,6 +8,9 @@ A browser extension to bridge YouTube with your Tube Archivist service.
 - Firefox: The addon is available on the [Extension store](https://addons.mozilla.org/addon/tubearchivist-companion/).
 - Chrome: The addon is available on the [Chrome Web Store](https://chrome.google.com/webstore/detail/tubearchivist-companion/jjnkmicfnfojkkgobdfeieblocadmcie).
 
+## Update
+After a new release here on GitHub, you'll get updates automatically in your browser. For Firefox this usually takes 1-2 hours, for Chrome 2-3 days, so please be patient.
+
 ## Permissions
 - **Access your data for www.youtube.com**: Needed for the addon to know your current page on YouTube to send the link to Tube Archivist.
 - **Storage**: Needed to store your connection details, needed to store your last visited YouTube link within the browser.
