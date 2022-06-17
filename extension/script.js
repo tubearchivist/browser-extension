@@ -24,11 +24,11 @@ function getBrowser() {
 
 function detectUrlType(url) {
 
-    const videoRe = new RegExp(/^https:\/\/(www\.)?(youtube.com\/watch\?v=|youtu\.be\/)\w{11}/);
+    const videoRe = new RegExp(/^https:\/\/(www\.)?(youtube.com\/watch\?v=|youtu\.be\/)[\w-]{11}/);
     if (videoRe.test(url)) {
         return "video"
     }
-    const channelRe = new RegExp(/^https:?\/\/www\.?youtube.com\/c|channel|user\/\w+(\/|featured|videos)?$/);
+    const channelRe = new RegExp(/^https:?\/\/www\.?youtube.com\/c|channel|user\/[\w-]+(\/|featured|videos)?$/);
     if (channelRe.test(url)) {
         return "channel"
     }
