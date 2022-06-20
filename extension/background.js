@@ -44,16 +44,16 @@ async function sendGet(path) {
 }
 
 
-// send post request to API backend
-async function sendPost(path, payload) {
+// send post/put request to API backend
+async function sendData(path, payload, method) {
 
     let access = await getAccess();
     const url = `${access.url}:${access.port}/${path}`;
-    console.log("POST: " + url);
-    console.log("POST: " + JSON.stringify(payload))
+    console.log(`${method}: ${url}`);
+    console.log(`${method}: ${JSON.stringify(payload)}`);
 
     const rawResponse = await fetch(url, {
-        method: "POST",
+        method: method,
         headers: {
             "Accept": "application/json",
             "Content-Type": "application/json",
@@ -109,7 +109,7 @@ async function downloadLink(toDownload) {
             }
         ]
     }
-    let response = await sendPost(path, payload)
+    let response = await sendData(path, payload, "POST")
 
     return response
 
@@ -126,7 +126,7 @@ async function subscribeLink(toSubscribe) {
             }
         ]
     }
-    let response = await sendPost(path, payload);
+    let response = await sendData(path, payload, "POST");
 
     return response
 
