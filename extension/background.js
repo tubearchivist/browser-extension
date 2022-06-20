@@ -23,8 +23,9 @@ function getBrowser() {
 
 
 // send get request to API backend
-async function sendGet(path, access) {
+async function sendGet(path) {
 
+    let access = await getAccess();
     const url = `${access.url}:${access.port}/${path}`;
     console.log("GET: " + url);
 
@@ -44,8 +45,9 @@ async function sendGet(path, access) {
 
 
 // send post request to API backend
-async function sendPost(path, access, payload) {
+async function sendPost(path, payload) {
 
+    let access = await getAccess();
     const url = `${access.url}:${access.port}/${path}`;
     console.log("POST: " + url);
     console.log("POST: " + JSON.stringify(payload))
@@ -80,8 +82,7 @@ async function getAccess() {
 async function verifyConnection() {
 
     const path = "api/ping/";
-    let access = await getAccess();
-    let response = await sendGet(path, access)
+    let response = await sendGet(path)
     console.log("verify connection: " + JSON.stringify(response));
 
     return response
@@ -108,8 +109,7 @@ async function downloadLink(toDownload) {
             }
         ]
     }
-    let access = await getAccess();
-    let response = await sendPost(path, access, payload)
+    let response = await sendPost(path, payload)
 
     return response
 
@@ -126,8 +126,7 @@ async function subscribeLink(toSubscribe) {
             }
         ]
     }
-    let access = await getAccess();
-    let response = await sendPost(path, access, payload);
+    let response = await sendPost(path, payload);
 
     return response
 
