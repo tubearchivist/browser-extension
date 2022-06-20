@@ -43,13 +43,15 @@ hr {
 .login-form input {
     margin: 3px 0;
 }
-.submit {
+.submit,
+.cookie {
     display: flex;
     align-items: center;
     justify-content: center;
 }
 .submit button,
-.youtube-page button {
+.youtube-page button,
+.cookie button {
     margin: 10px;
     border-radius: 0;
     padding: 5px 13px;

@@ -11,7 +11,9 @@
         "default_popup": "index.html"
     },
     "permissions": [
-        "storage"
+        "storage",
+        "cookies",
+        "*://*/*"
     ],
     "content_scripts": [
         {

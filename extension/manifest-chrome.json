@@ -11,7 +11,11 @@
         "default_popup": "index.html"
     },
     "permissions": [
-        "storage"
+        "storage",
+        "cookies"
+    ],
+    "host_permissions": [
+        "*://*/*"
     ],
     "content_scripts": [
         {

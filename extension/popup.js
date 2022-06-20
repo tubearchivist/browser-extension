@@ -41,6 +41,28 @@ document.getElementById("status-icon").addEventListener("click", function() {
 })
 
 
+// send cookie
+document.getElementById("send-cookies").addEventListener("click", function() {
+    sendCookie();
+})
+
+
+function sendCookie() {
+    console.log("popup send cookie");
+
+    function handleResponse(message) {
+        console.log("handle cookie response: " + message);
+    }
+
+    function handleError(error) {
+        console.log(`Error: ${error}`);
+    }
+
+    let sending = browserType.runtime.sendMessage({"cookie": true});
+    sending.then(handleResponse, handleError);
+}
+
+
 // send ping message to TA backend
 function pingBackend() {
 

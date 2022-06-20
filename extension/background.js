@@ -133,6 +133,44 @@ async function subscribeLink(toSubscribe) {
 
 }
 
+function buildCookieLine(cookie) {
+    return [
+        cookie.domain,
+        cookie.hostOnly.toString().toUpperCase(),
+        cookie.path,
+        cookie.httpOnly.toString().toUpperCase(),
+        cookie.expirationDate,
+        cookie.name,
+        cookie.value,
+    ].join("\t");
+}
+
+
+async function sendCookies() {
+    console.log("function sendCookies");
+
+    let cookieStores = await browserType.cookies.getAllCookieStores();
+    var cookieLines = [
+        "# Netscape HTTP Cookie File\n",
+        "# https://curl.haxx.se/rfc/cookie_spec.html\n",
+        "# This is a generated file! Do not edit.\n\n"
+    ];
+    for (let i = 0; i < cookieStores.length; i++) {
+        const cookieStore = cookieStores[i];
+        var allCookiesStore = await browserType.cookies.getAll({
+            domain: ".youtube.com",
+            storeId: cookieStore["id"]
+        });
+        for (let j = 0; j < allCookiesStore.length; j++) {
+            const cookie = allCookiesStore[j];
+            cookieLines.push(buildCookieLine(cookie));
+        }
+    }
+    console.log(cookieLines.join("\n"));
+
+}
+
+
 
 // process and return message if needed
 function handleMessage(request, sender, sendResponse) {
@@ -155,6 +193,9 @@ function handleMessage(request, sender, sendResponse) {
         response.then(message => {
             sendResponse(message)
         })
+    } else if (request.cookie) {
+        console.log("backgound: " + JSON.stringify(request));
+        let response = sendCookies();
     }
 
     return true;
