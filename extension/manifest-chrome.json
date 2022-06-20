@@ -15,7 +15,7 @@
         "cookies"
     ],
     "host_permissions": [
-        "*://*/*"
+        "https://*.youtube.com/*"
     ],
     "content_scripts": [
         {
