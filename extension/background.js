@@ -151,9 +151,9 @@ async function sendCookies() {
 
     let cookieStores = await browserType.cookies.getAllCookieStores();
     var cookieLines = [
-        "# Netscape HTTP Cookie File\n",
-        "# https://curl.haxx.se/rfc/cookie_spec.html\n",
-        "# This is a generated file! Do not edit.\n\n"
+        "# Netscape HTTP Cookie File",
+        "# https://curl.haxx.se/rfc/cookie_spec.html",
+        "# This is a generated file! Do not edit.\n"
     ];
     for (let i = 0; i < cookieStores.length; i++) {
         const cookieStore = cookieStores[i];
@@ -166,6 +166,7 @@ async function sendCookies() {
             cookieLines.push(buildCookieLine(cookie));
         }
     }
+    console.log(cookieLines.length);
     console.log(cookieLines.join("\n"));
 
 }
