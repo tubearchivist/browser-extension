@@ -132,10 +132,25 @@ async function subscribeLink(toSubscribe) {
 
 }
 
+
+async function cookieStr(cookieLines) {
+
+    let cookieString = cookieLines.join("\n");
+    const path = "api/cookie/";
+    let payload = {
+        "cookie": cookieString
+    }
+    let response = await sendData(path, payload, "PUT");
+
+    return response
+
+}
+
+
 function buildCookieLine(cookie) {
     return [
         cookie.domain,
-        cookie.hostOnly.toString().toUpperCase(),
+        "TRUE",
         cookie.path,
         cookie.httpOnly.toString().toUpperCase(),
         cookie.expirationDate,
@@ -165,8 +180,10 @@ async function sendCookies() {
             cookieLines.push(buildCookieLine(cookie));
         }
     }
-    console.log(cookieLines.length);
-    console.log(cookieLines.join("\n"));
+
+    let response = cookieStr(cookieLines);
+    
+    return response
 
 }
 
@@ -196,6 +213,9 @@ function handleMessage(request, sender, sendResponse) {
     } else if (request.cookie) {
         console.log("backgound: " + JSON.stringify(request));
         let response = sendCookies();
+        response.then(message => {
+            sendResponse(message)
+        })
     }
 
     return true;
