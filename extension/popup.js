@@ -42,7 +42,7 @@ document.getElementById("status-icon").addEventListener("click", function() {
 
 
 // send cookie
-document.getElementById("send-cookies").addEventListener("click", function() {
+document.getElementById("sendCookies").addEventListener("click", function() {
     sendCookie();
 })
 
@@ -51,14 +51,28 @@ function sendCookie() {
     console.log("popup send cookie");
 
     function handleResponse(message) {
-        console.log("handle cookie response: " + message);
+        console.log("handle cookie response: " + JSON.stringify(message));
+        let cookie_validated = message.cookie_validated;
+        document.getElementById("sendCookiesStatus").innerText = "validated: " + cookie_validated
     }
 
     function handleError(error) {
         console.log(`Error: ${error}`);
     }
 
-    let sending = browserType.runtime.sendMessage({"cookie": true});
+    let checked = document.getElementById("sendCookies").checked;
+    let toStore = {
+        "sendCookies": {
+            "checked": checked
+        }
+    };
+    browserType.storage.local.set(toStore, function() {
+        console.log("stored option: " + JSON.stringify(toStore));
+    })
+    if (checked === false) {
+        return
+    }
+    let sending = browserType.runtime.sendMessage({"sendCookie": true});
     sending.then(handleResponse, handleError);
 }
 
@@ -88,6 +102,27 @@ function pingBackend() {
 function addUrl(access) {
     const url = `${access.url}:${access.port}`;
     document.getElementById("ta-url").setAttribute("href", url);
+}
+
+
+function setCookieState() {
+
+    function handleResponse(message) {
+        console.log(message);
+        document.getElementById("sendCookies").checked = message.cookie_enabled;
+        if (message.validated_str) {
+            document.getElementById("sendCookiesStatus").innerText = message.validated_str;
+        }
+    }
+
+    function handleError(error) {
+        console.log(`Error: ${error}`);
+    }
+
+    console.log("set cookie state");
+    let sending = browserType.runtime.sendMessage({"cookieState": true});
+    sending.then(handleResponse, handleError)
+    document.getElementById("sendCookies").checked = true;
 }
 
 
@@ -183,6 +218,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         pingBackend();
         addUrl(item.access);
     };
+
+    function setCookiesOptions(result) {
+        if (!result.sendCookies || result.sendCookies.checked === false) {
+            console.log("sync cookies not set");
+            return
+        }
+        console.log("set options: " + JSON.stringify(result));
+        setCookieState();
+
+    }
     
     function onError(error) {
         console.log(`Error: ${error}`);
@@ -191,6 +236,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     browserType.storage.local.get("access", function(result) {
         onGot(result)
     });
+
+    browserType.storage.local.get("sendCookies", function(result) {
+        setCookiesOptions(result)
+    })
 
     browserType.storage.local.get("youtube", function(result) {
         if (result.youtube) {

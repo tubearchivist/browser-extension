@@ -78,6 +78,18 @@ async function getAccess() {
 }
 
 
+// check if cookie is valid
+async function getCookieState() {
+
+    const path = "api/cookie/";
+    let response = await sendGet(path)
+    console.log("cookie state: " + JSON.stringify(response));
+    
+    return response
+
+}
+
+
 // send ping to server, return response
 async function verifyConnection() {
 
@@ -135,10 +147,9 @@ async function subscribeLink(toSubscribe) {
 
 async function cookieStr(cookieLines) {
 
-    let cookieString = cookieLines.join("\n");
     const path = "api/cookie/";
     let payload = {
-        "cookie": cookieString
+        "cookie": cookieLines.join("\n")
     }
     let response = await sendData(path, payload, "PUT");
 
@@ -210,7 +221,12 @@ function handleMessage(request, sender, sendResponse) {
         response.then(message => {
             sendResponse(message)
         })
-    } else if (request.cookie) {
+    } else if (request.cookieState) {
+        let response = getCookieState();
+        response.then(message => {
+            sendResponse(message)
+        })
+    } else if (request.sendCookie) {
         console.log("backgound: " + JSON.stringify(request));
         let response = sendCookies();
         response.then(message => {

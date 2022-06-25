@@ -43,15 +43,13 @@ hr {
 .login-form input {
     margin: 3px 0;
 }
-.submit,
-.cookie {
+.submit {
     display: flex;
     align-items: center;
     justify-content: center;
 }
 .submit button,
-.youtube-page button,
-.cookie button {
+.youtube-page button {
     margin: 10px;
     border-radius: 0;
     padding: 5px 13px;
@@ -65,6 +63,13 @@ hr {
     background-color: #97d4c8;
     transform: scale(1.05);
     color: #00202f;
+}
+.options {
+    display: flex;
+    padding-bottom: 10px;
+}
+.options span {
+    margin-left: 10px;
 }
 .icons {
     display: flex;
