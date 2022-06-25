@@ -164,7 +164,7 @@ function buildCookieLine(cookie) {
         "TRUE",
         cookie.path,
         cookie.httpOnly.toString().toUpperCase(),
-        cookie.expirationDate,
+        Math.trunc(cookie.expirationDate) || 0,
         cookie.name,
         cookie.value,
     ].join("\t");
