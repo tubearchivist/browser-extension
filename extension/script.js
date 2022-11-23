@@ -199,21 +199,43 @@ function getChannelContainers() {
     return nodes
 }
 
-function getVideoContainers() {
-    var nodes = document.querySelectorAll('#title-wrapper, #title');
+function getThubnailContainers() {
+    var nodes = document.querySelectorAll('#thumbnail');
     return nodes
 }
 
-
-function buildVideoButton(videoContainer) {
-    var titleLink = videoContainer.querySelector('#video-title')?.href;
-    if (titleLink == null) return;
+function buildVideoButton(thumbContainer) {
+    var thumbLink = thumbContainer?.href;
+    if (!thumbLink) return;
+    if (thumbLink.includes('list=') || thumbLink.includes('/shorts/')) return;
 
     var dlButton = document.createElement("a");
+    dlButton.setAttribute("id", "ta-video-button");
     dlButton.href = '#'
+
+    dlButton.addEventListener('click', e => {
+        e.preventDefault();
+        let videoLink = thumbContainer.href;
+        console.log("download: " + videoLink);
+    });
+    dlButton.addEventListener('mouseover', e => {
+        Object.assign(dlButton.style, {
+            opacity: 1,
+        });
+        let videoTitle = thumbContainer.href;
+        e.target.title = "TA download: " + videoTitle;
+    })
+    dlButton.addEventListener('mouseout', e => {
+        Object.assign(dlButton.style, {
+            opacity: 0,
+        });
+    })
 
     Object.assign(dlButton.style, {
         display: "flex",
+        position: "absolute",
+        top: "5px",
+        left: "5px",
         alignItems: "center",
         backgroundColor: "#00202f",
         color: "#fff",
@@ -221,6 +243,8 @@ function buildVideoButton(videoContainer) {
         textDecoration: "none",
         borderRadius: "8px",
         cursor: "pointer",
+        opacity: 0,
+        transition: "all 0.3s ease 0.3s",
     });
     
     var dlIcon = document.createElement("span");
@@ -230,19 +254,11 @@ function buildVideoButton(videoContainer) {
         width: "20px",
         padding: "10px 13px",
     });
+    
     dlButton.appendChild(dlIcon);
 
-    dlIcon.addEventListener('click', e => {
-        e.preventDefault();
-        let videoLink = videoContainer.querySelector('#video-title')?.href;
-        console.log("download: " + videoLink);
-    });
-    dlIcon.addEventListener('mouseover', e => {
-        let videoTitle = videoContainer.querySelector('#video-title')?.text.trim();
-        e.target.title = "TA download: " + videoTitle;
-    })
-
     return dlButton
+
 }
 
 
@@ -257,42 +273,17 @@ function ensureTALinks() {
         channelContainer.hasTA = true;
     }
 
-    var videoContainerNodes = getVideoContainers()
+    var thumbContainerNodes = getThubnailContainers();
 
-    for (var videoContainer of videoContainerNodes) {
-        if (videoContainer.hasTA) continue;
-        var videoButton = buildVideoButton(videoContainer);
+    for (var thumbContainer of thumbContainerNodes) {
+        if (thumbContainer.hasTA) continue;
+        var videoButton = buildVideoButton(thumbContainer);
         if (videoButton == null) continue;
-        videoContainer.appendChild(videoButton);
-        videoContainer.hasTA = true;
+        thumbContainer.parentElement.appendChild(videoButton);
+        thumbContainer.hasTA = true;
     }
 
-    // var videoContainerNodes = getVideoContainers();
-    // for (var videoContainer of videoContainerNodes) {
-    //     console.log(videoContainerNodes);
-    // }
-
 }
-
-
-// function detectUrlType(url) {
-
-//     const videoRe = new RegExp(/^https:\/\/(www\.)?(youtube.com\/watch\?v=|youtu\.be\/)[\w-]{11}/);
-//     if (videoRe.test(url)) {
-//         return "video"
-//     }
-//     const channelRe = new RegExp(/^https:?\/\/www\.?youtube.com\/c|channel|user\/[\w-]+(\/|featured|videos)?$/);
-//     if (channelRe.test(url)) {
-//         return "channel"
-//     }
-//     const playlistRe = new RegExp(/^https:\/\/(www\.)?youtube.com\/playlist\?list=/);
-//     if (playlistRe.test(url)) {
-//         return "playlist"
-//     }
-
-//     return false
-
-// }
 
 
 function sendUrl() {
