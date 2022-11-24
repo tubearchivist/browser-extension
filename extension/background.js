@@ -101,47 +101,36 @@ async function verifyConnection() {
 }
 
 
-// store last youtube link
-function setYoutubeLink(data) {
-    browserType.storage.local.set(data, function() {
-        console.log("Stored history: " + JSON.stringify(data));
-    });
-}
-
-
-// send download task to server, return response
-async function downloadLink(toDownload) {
-
-    const path = "api/download/";
-    let payload = {
-        "data": [
-            {
-                "youtube_id": toDownload,
-                "status": "pending",
-            }
-        ]
+// send youtube link from injected buttons
+async function youtubeLink(youtubeMessage) {
+    
+    let path;
+    let payload;
+    
+    if (youtubeMessage.action === "download") {
+        path = "api/download/";
+        payload = {
+            "data": [
+                {
+                    "youtube_id": youtubeMessage.url,
+                    "status": "pending",
+                }
+            ]
+        }
+    } else if (youtubeMessage.action === "subscribe") {
+        path = "api/channel/";
+        payload = {
+            "data": [
+                {
+                    "channel_id": youtubeMessage.url,
+                    "channel_subscribed": true,
+                }
+            ]
+        }
     }
-    let response = await sendData(path, payload, "POST")
 
-    return response
-
-}
-
-async function subscribeLink(toSubscribe) {
-
-    const path = "api/channel/";
-    let payload = {
-        "data": [
-            {
-                "channel_id": toSubscribe,
-                "channel_subscribed": true,
-            }
-        ]
-    }
     let response = await sendData(path, payload, "POST");
-
     return response
-
 }
 
 
@@ -210,14 +199,7 @@ function handleMessage(request, sender, sendResponse) {
             sendResponse(message);
         })
     } else if (request.youtube) {
-        setYoutubeLink(request)
-    } else if (request.download) {
-        let response = downloadLink(request.download.url);
-        response.then(message => {
-            sendResponse(message)
-        })
-    } else if (request.subscribe) {
-        let response = subscribeLink(request.subscribe.url);
+        let response = youtubeLink(request.youtube);
         response.then(message => {
             sendResponse(message)
         })

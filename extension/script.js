@@ -126,7 +126,8 @@ function buildSubLink(channelContainer) {
     subLink.innerText = "Subscribe";
     subLink.addEventListener('click', e => {
         e.preventDefault();
-        console.log("subscribe to: " + currentLocation)
+        console.log("subscribe to: " + currentLocation);
+        sendUrl(currentLocation, "subscribe");
     });
     subLink.addEventListener("mouseover", e => {
         let subText
@@ -161,6 +162,7 @@ function buildDlLink(channelContainer) {
     dlLink.addEventListener('click', e => {
         e.preventDefault();
         console.log("download: " + currentLocation)
+        sendUrl(currentLocation, "download");
     });
     dlLink.addEventListener("mouseover", e => {
         let channelName = channelContainer.querySelector("#text").textContent;
@@ -217,6 +219,7 @@ function buildVideoButton(thumbContainer) {
         e.preventDefault();
         let videoLink = thumbContainer.href;
         console.log("download: " + videoLink);
+        sendUrl(videoLink, "download");
     });
     dlButton.addEventListener('mouseover', e => {
         Object.assign(dlButton.style, {
@@ -286,26 +289,18 @@ function ensureTALinks() {
 }
 
 
-function sendUrl() {
-
-    let url = document.URL
-
-    let urlType = detectUrlType(url);
-    if (urlType == false) {
-        console.log("not relevant")
-        return
-    }
+function sendUrl(url, action) {
 
     let payload = {
         "youtube": {
             "url": url,
-            "title": document.title,
-            "type": urlType,
+            "action": action,
         }
     }
+
     console.log("youtube link: " + JSON.stringify(payload));
     browserType.runtime.sendMessage(payload, function(response) {
-        console.log(response.farewell);
+        console.log("sendUrl response: " + JSON.stringify(response))
     });
 
 };
