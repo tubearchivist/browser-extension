@@ -165,8 +165,14 @@ function buildDlLink(channelContainer) {
         sendUrl(currentLocation, "download");
     });
     dlLink.addEventListener("mouseover", e => {
-        let channelName = channelContainer.querySelector("#text").textContent;
-        e.target.title = "TA Download: " + channelName;
+        let subText
+        if (window.location.pathname == "/watch") {
+            subText = window.location.href;
+        } else {
+            subText = channelContainer.querySelector("#text").textContent;
+        };
+
+        e.target.title = "TA Download: " + subText;
     });
     Object.assign(dlLink.style, {
         filter: "invert()",
