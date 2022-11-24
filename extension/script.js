@@ -355,10 +355,20 @@ function sendUrl(url, action, button) {
 };
 
 
+let throttleBlock;
+const throttle = (callback, time) => {
+    if (throttleBlock) return;
+    throttleBlock = true;
+    setTimeout(() => {
+        console.log("observer hit");
+        callback();
+        throttleBlock = false;
+    }, time);
+};
+
 let observer = new MutationObserver(list => {
     if (list.some(i => i.type === 'childList' && i.addedNodes.length > 0)) {
-        console.log("observer hit")
-        ensureTALinks();
+        throttle(ensureTALinks, 700);
     }
 });
 
