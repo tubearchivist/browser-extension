@@ -122,17 +122,17 @@ function buildButtonDiv() {
 
 function buildSubLink(channelContainer) {
     var subLink = document.createElement("span");
-    var currentLocation = window.location;
+    var currentLocation = window.location.href;
     subLink.innerText = "Subscribe";
     subLink.addEventListener('click', e => {
         e.preventDefault();
         console.log("subscribe to: " + currentLocation);
-        sendUrl(currentLocation, "subscribe");
+        sendUrl(currentLocation, "subscribe", subLink);
     });
     subLink.addEventListener("mouseover", e => {
         let subText
         if (window.location.pathname == "/watch") {
-            subText = window.location.href;
+            subText = currentLocation;
         } else {
             subText = channelContainer.querySelector("#text").textContent;
         };
@@ -156,18 +156,18 @@ function buildSpacer() {
 
 function buildDlLink(channelContainer) {
     var dlLink = document.createElement("span");
-    var currentLocation = window.location;
+    var currentLocation = window.location.href;
     dlLink.innerHTML = downloadIcon;
 
     dlLink.addEventListener('click', e => {
         e.preventDefault();
         console.log("download: " + currentLocation)
-        sendUrl(currentLocation, "download");
+        sendUrl(currentLocation, "download", dlLink);
     });
     dlLink.addEventListener("mouseover", e => {
         let subText
         if (window.location.pathname == "/watch") {
-            subText = window.location.href;
+            subText = currentLocation;
         } else {
             subText = channelContainer.querySelector("#text").textContent;
         };
@@ -225,7 +225,7 @@ function buildVideoButton(thumbContainer) {
         e.preventDefault();
         let videoLink = thumbContainer.href;
         console.log("download: " + videoLink);
-        sendUrl(videoLink, "download");
+        sendUrl(videoLink, "download", dlButton)
     });
     dlButton.addEventListener('mouseover', e => {
         Object.assign(dlButton.style, {
@@ -295,7 +295,50 @@ function ensureTALinks() {
 }
 
 
-function sendUrl(url, action) {
+function buttonError(button) {
+    let buttonSpan = button.querySelector("span");
+    if (buttonSpan === null) {
+        buttonSpan = button
+    }
+    buttonSpan.style.filter = "invert(19%) sepia(93%) saturate(7472%) hue-rotate(359deg) brightness(105%) contrast(113%)";
+    buttonSpan.style.color = "red";
+
+    button.style.opacity = 1;
+    button.addEventListener('mouseout', e => {
+        Object.assign(button.style, {
+            opacity: 1,
+        });
+    })
+}
+
+function buttonSuccess(button) {
+    let buttonSpan = button.querySelector("span");
+    if (buttonSpan === null) {
+        buttonSpan = button;
+    }
+    if (buttonSpan.innerHTML === "Subscribe") {
+        buttonSpan.innerHTML = "Success";
+    } else {
+        buttonSpan.innerHTML = checkmarkIcon;
+    }
+}
+
+
+function sendUrl(url, action, button) {
+
+    function handleResponse(message) {
+        console.log("sendUrl response: " + JSON.stringify(message));
+        if (message === null || message.detail === "Invalid token.") {
+            buttonError(button);
+        } else {
+            buttonSuccess(button);
+        }
+    }
+
+    function handleError(error) {
+        console.log("error");
+        console.log(JSON.stringify(error));
+    }
 
     let payload = {
         "youtube": {
@@ -305,9 +348,9 @@ function sendUrl(url, action) {
     }
 
     console.log("youtube link: " + JSON.stringify(payload));
-    browserType.runtime.sendMessage(payload, function(response) {
-        console.log("sendUrl response: " + JSON.stringify(response))
-    });
+
+    let sending = browserType.runtime.sendMessage(payload);
+    sending.then(handleResponse, handleError);
 
 };
 

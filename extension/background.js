@@ -52,19 +52,24 @@ async function sendData(path, payload, method) {
     console.log(`${method}: ${url}`);
     console.log(`${method}: ${JSON.stringify(payload)}`);
 
-    const rawResponse = await fetch(url, {
-        method: method,
-        headers: {
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-            "Authorization": "Token " + access.apiKey,
-            "mode": "no-cors"
-        },
-        body: JSON.stringify(payload)
-    });
+    try {
+        const rawResponse = await fetch(url, {
+            method: method,
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": "Token " + access.apiKey,
+                "mode": "no-cors"
+            },
+            body: JSON.stringify(payload)
+        });
+        const content = await rawResponse.json();
+        return content;
+    } catch (e) {
+        console.error(e);
+        return null
+    }
 
-    const content = await rawResponse.json();
-    return content;
 }
 
 
