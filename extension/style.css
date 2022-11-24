@@ -48,8 +48,7 @@ hr {
     align-items: center;
     justify-content: center;
 }
-.submit button,
-.youtube-page button {
+.submit button {
     margin: 10px;
     border-radius: 0;
     padding: 5px 13px;
@@ -58,8 +57,7 @@ hr {
     background-color: #259485;
     color: #ffffff;
 }
-.submit button:hover,
-.youtube-page button:hover {
+.submit button:hover {
     background-color: #97d4c8;
     transform: scale(1.05);
     color: #00202f;

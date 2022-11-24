@@ -141,68 +141,6 @@ function setStatusIcon(connected) {
 }
 
 
-function downloadEvent() {
-
-    let button = document.getElementById("downloadButton");
-    let payload = {
-        "download": {
-            "url": button.getAttribute("data-id")
-        }
-    };
-
-    function handleResponse(message) {
-        console.log("popup.js response: " + JSON.stringify(message));
-        browserType.storage.local.remove("youtube").then(response => {
-            let download = document.getElementById("download");
-            download.innerHTML = ""
-            let message = document.createElement("p");
-            message.innerText = "Download link sent to Tube Archivist"
-            download.appendChild(message)
-            download.appendChild(document.createElement("hr"));
-        })
-    }
-    
-    function handleError(error) {
-        console.log(`Error: ${error}`);
-    }
-
-    let sending = browserType.runtime.sendMessage(payload);
-    sending.then(handleResponse, handleError)
-
-}
-
-
-function subscribeEvent() {
-
-    let button = document.getElementById("subscribeButton");
-    let payload = {
-        "subscribe": {
-            "url": button.getAttribute("data-id")
-        }
-    };
-
-    function handleResponse(message) {
-        console.log("popup.js response: " + JSON.stringify(message));
-        browserType.storage.local.remove("youtube").then(response => {
-            let download = document.getElementById("download");
-            download.innerHTML = ""
-            let message = document.createElement("p");
-            message.innerText = "Subscribe link sent to Tube Archivist"
-            download.appendChild(message)
-            download.appendChild(document.createElement("hr"));
-        })
-    }
-
-    function handleError(error) {
-        console.log(`Error: ${error}`);
-    }
-
-    let sending = browserType.runtime.sendMessage(payload);
-    sending.then(handleResponse, handleError)
-
-}
-
-
 // fill in form
 document.addEventListener("DOMContentLoaded", async () => {
 
@@ -241,41 +179,4 @@ document.addEventListener("DOMContentLoaded", async () => {
         setCookiesOptions(result)
     })
 
-    browserType.storage.local.get("youtube", function(result) {
-        if (result.youtube) {
-            createButtons(result);
-        }
-    })
-
 })
-
-
-function createButtons(result) {
-
-    let download = document.getElementById("download");
-    let linkType = document.createElement("h3");
-    linkType.innerText = result.youtube.type.charAt(0).toUpperCase() + result.youtube.type.slice(1);
-    let title = document.createElement("p");
-    title.innerText = result.youtube.title;
-
-    // dl button
-    let downloadButton = document.createElement("button");
-    downloadButton.innerText = "download";
-    downloadButton.id = "downloadButton";
-    downloadButton.setAttribute("data-id", result.youtube.url);
-    downloadButton.addEventListener("click", function(){downloadEvent()}, false);
-
-    // subscribe button
-    let subscribeButton = document.createElement("button");
-    subscribeButton.innerText = "subscribe";
-    subscribeButton.id = "subscribeButton";
-    subscribeButton.setAttribute("data-id", result.youtube.url);
-    subscribeButton.addEventListener("click", function(){subscribeEvent()}, false);
-
-    download.appendChild(linkType);
-    download.appendChild(title);
-    download.appendChild(downloadButton);
-    download.appendChild(subscribeButton);
-    download.appendChild(document.createElement("hr"));
-
-}
