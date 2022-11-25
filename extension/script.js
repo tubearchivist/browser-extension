@@ -318,8 +318,14 @@ function buttonSuccess(button) {
     }
     if (buttonSpan.innerHTML === "Subscribe") {
         buttonSpan.innerHTML = "Success";
+        setTimeout(() => {
+            buttonSpan.innerHTML = "Subscribe";
+        }, 2000);
     } else {
         buttonSpan.innerHTML = checkmarkIcon;
+        setTimeout(() => {
+            buttonSpan.innerHTML = downloadIcon;
+        }, 2000);
     }
 }
 
