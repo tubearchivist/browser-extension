@@ -16,7 +16,7 @@ function getBrowser() {
             return chrome;
         }
     } else {
-        console.log("failed to dedect browser");
+        console.log("failed to detect browser");
         throw "browser detection error"
     };
 }
