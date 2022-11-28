@@ -21,15 +21,15 @@ function getBrowser() {
 
 // store access details
 document.getElementById("save-login").addEventListener("click", function () {
-    let url = document.getElementById("url").value;
+    let url = document.getElementById("full-url").value;
     if (!url.includes('://')) {
         url = 'http://' + url;
     }
     let parsed = new URL(url);
     let toStore = {
         "access": {
-            "url": document.getElementById("full-url").host,
-            "port": document.getElementById("port").port || '80',
+            "url": parsed.host,
+            "port": parsed.port || '80',
             "apiKey": document.getElementById("api-key").value
         }
     };
@@ -91,7 +91,7 @@ function pingBackend() {
             console.log("connection validated")
         }
     }
-    
+
     function handleError(error) {
         console.log(`Error: ${error}`);
         setStatusIcon(false);
@@ -175,7 +175,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         setCookieState();
 
     }
-    
+
     function onError(error) {
         console.log(`Error: ${error}`);
     };
