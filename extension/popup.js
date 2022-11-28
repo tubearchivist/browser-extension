@@ -21,10 +21,15 @@ function getBrowser() {
 
 // store access details
 document.getElementById("save-login").addEventListener("click", function () {
+    let url = document.getElementById("full-url").value;
+    if (!url.includes('://')) {
+        url = 'http://' + url;
+    }
+    let parsed = new URL(url);
     let toStore = {
         "access": {
-            "url": document.getElementById("url").value,
-            "port": document.getElementById("port").value,
+            "url": `${parsed.protocol}//${parsed.hostname}`,
+            "port": parsed.port || (parsed.protocol === 'https' ? '443' : '80'),
             "apiKey": document.getElementById("api-key").value
         }
     };
@@ -86,7 +91,7 @@ function pingBackend() {
             console.log("connection validated")
         }
     }
-    
+
     function handleError(error) {
         console.log(`Error: ${error}`);
         setStatusIcon(false);
@@ -150,8 +155,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             setStatusIcon(false);
             return
         }
-        document.getElementById("url").value = item.access.url;
-        document.getElementById("port").value = item.access.port;
+        let { url, port } = item.access;
+        let fullUrl = url;
+        if (!(url.startsWith('http://') && port === '80')) {
+            fullUrl += `:${port}`;
+        }
+        document.getElementById("full-url").value = fullUrl;
         document.getElementById("api-key").value = item.access.apiKey;
         pingBackend();
         addUrl(item.access);
@@ -166,7 +175,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         setCookieState();
 
     }
-    
+
     function onError(error) {
         console.log(`Error: ${error}`);
     };
