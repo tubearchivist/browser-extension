@@ -5,8 +5,8 @@ body {
 }
 .container {
     padding: 10px;
-    min-width: 300px;
-    max-width: 400px;
+    min-width: 350px;
+    max-width: 450px;
 }
 .h3 {
     font-family: Sen-bold, sans-serif;
