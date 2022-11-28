@@ -55,7 +55,8 @@ Use the correct manifest file for your browser. Either rename the browser specif
 
 ## Roadmap
 Join us on [Discord](https://discord.gg/AFwz8nE7BK) and help us improve and extend this project. This is a list of planned features, in no particular order:
-- Get download and subscribe status from TA to show on the injected buttons
-- Implement download button for videos on the YouTube homepage over inline preview
-- Implement download/subscribe button for playlists
-- Implement download button for videos on playlist
+- [ ] Get download and subscribe status from TA to show on the injected buttons
+- [ ] Implement download button for videos on the YouTube homepage over inline preview
+- [ ] Implement download/subscribe button for playlists
+- [ ] Implement download button for videos on playlist
+- [ ] Error handling for connection errors
