@@ -122,16 +122,17 @@ function buildButtonDiv() {
 
 function buildSubLink(channelContainer) {
     var subLink = document.createElement("span");
-    var currentLocation = window.location.href;
     subLink.innerText = "Subscribe";
     subLink.addEventListener('click', e => {
         e.preventDefault();
+        var currentLocation = window.location.href;
         console.log("subscribe to: " + currentLocation);
         sendUrl(currentLocation, "subscribe", subLink);
     });
     subLink.addEventListener("mouseover", e => {
         let subText
         if (window.location.pathname == "/watch") {
+            var currentLocation = window.location.href;
             subText = currentLocation;
         } else {
             subText = channelContainer.querySelector("#text").textContent;
@@ -156,17 +157,18 @@ function buildSpacer() {
 
 function buildDlLink(channelContainer) {
     var dlLink = document.createElement("span");
-    var currentLocation = window.location.href;
     dlLink.innerHTML = downloadIcon;
 
     dlLink.addEventListener('click', e => {
         e.preventDefault();
+        var currentLocation = window.location.href;
         console.log("download: " + currentLocation)
         sendUrl(currentLocation, "download", dlLink);
     });
     dlLink.addEventListener("mouseover", e => {
         let subText
         if (window.location.pathname == "/watch") {
+            var currentLocation = window.location.href;
             subText = currentLocation;
         } else {
             subText = channelContainer.querySelector("#text").textContent;
@@ -366,7 +368,6 @@ const throttle = (callback, time) => {
     if (throttleBlock) return;
     throttleBlock = true;
     setTimeout(() => {
-        console.log("observer hit");
         callback();
         throttleBlock = false;
     }, time);
