@@ -112,7 +112,7 @@ function buildButtonDiv() {
         alignItems: "center",
         backgroundColor: "#00202f",
         color: "#fff",
-        fontSize: "1.7rem",
+        fontSize: "14px",
         padding: "5px",
         margin: "0 5px",
         borderRadius: "8px",
@@ -141,7 +141,7 @@ function buildSubLink(channelContainer) {
         e.target.title = "TA Subscribe: " + subText;
     });
     Object.assign(subLink.style, {
-        padding: "5px 10px",
+        padding: "5px",
         cursor: "pointer",
     });
     
@@ -179,7 +179,7 @@ function buildDlLink(channelContainer) {
     Object.assign(dlLink.style, {
         filter: "invert()",
         width: "20px",
-        padding: "0 10px",
+        padding: "0 5px",
         cursor: "pointer",
     });
 
@@ -273,11 +273,36 @@ function buildVideoButton(thumbContainer) {
 }
 
 
+// fix positioning of #owner div to fit new button
+function adjustOwner(channelContainer) {
+    let sponsorButton = channelContainer.querySelector('#sponsor-button');
+    if (sponsorButton === null) {
+        return channelContainer
+    }
+
+    let variableMinWidth
+    if (sponsorButton.hasChildNodes()) {
+        variableMinWidth = '140px';
+    } else {
+        variableMinWidth = '45px';
+    }
+
+    Object.assign(channelContainer.firstElementChild.style, {
+        minWidth: variableMinWidth
+    })
+    Object.assign(channelContainer.style, {
+        minWidth: 'calc(40% + 50px)'
+    })
+    return channelContainer
+}
+
+
 function ensureTALinks() {
 
     var channelContainerNodes = getChannelContainers()
 
     for (var channelContainer of channelContainerNodes) {
+        channelContainer = adjustOwner(channelContainer);
         if (channelContainer.hasTA) continue;
         var channelButton = buildChannelButton(channelContainer);
         channelContainer.appendChild(channelButton);
