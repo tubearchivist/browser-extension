@@ -29,7 +29,7 @@ document.getElementById("save-login").addEventListener("click", function () {
     let toStore = {
         "access": {
             "url": `${parsed.protocol}//${parsed.hostname}`,
-            "port": parsed.port || (parsed.protocol === 'https' ? '443' : '80'),
+            "port": parsed.port || (parsed.protocol === 'https:' ? '443' : '80'),
             "apiKey": document.getElementById("api-key").value
         }
     };
