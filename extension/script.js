@@ -102,7 +102,7 @@ viewBox="0 0 500 500" style="enable-background:new 0 0 500 500;" xml:space="pres
 </svg>`;
 
 function buildButtonDiv() {
-  var buttonDiv = document.createElement('div');
+  let buttonDiv = document.createElement('div');
   buttonDiv.setAttribute('id', 'ta-channel-button');
 
   Object.assign(buttonDiv.style, {
@@ -119,18 +119,18 @@ function buildButtonDiv() {
 }
 
 function buildSubLink(channelContainer) {
-  var subLink = document.createElement('span');
+  let subLink = document.createElement('span');
   subLink.innerText = 'Subscribe';
   subLink.addEventListener('click', e => {
     e.preventDefault();
-    var currentLocation = window.location.href;
+    let currentLocation = window.location.href;
     console.log('subscribe to: ' + currentLocation);
     sendUrl(currentLocation, 'subscribe', subLink);
   });
   subLink.addEventListener('mouseover', e => {
     let subText;
     if (window.location.pathname == '/watch') {
-      var currentLocation = window.location.href;
+      let currentLocation = window.location.href;
       subText = currentLocation;
     } else {
       subText = channelContainer.querySelector('#text').textContent;
@@ -147,26 +147,26 @@ function buildSubLink(channelContainer) {
 }
 
 function buildSpacer() {
-  var spacer = document.createElement('span');
+  let spacer = document.createElement('span');
   spacer.innerText = '|';
 
   return spacer;
 }
 
 function buildDlLink(channelContainer) {
-  var dlLink = document.createElement('span');
+  let dlLink = document.createElement('span');
   dlLink.innerHTML = downloadIcon;
 
   dlLink.addEventListener('click', e => {
     e.preventDefault();
-    var currentLocation = window.location.href;
+    let currentLocation = window.location.href;
     console.log('download: ' + currentLocation);
     sendUrl(currentLocation, 'download', dlLink);
   });
   dlLink.addEventListener('mouseover', e => {
     let subText;
     if (window.location.pathname == '/watch') {
-      var currentLocation = window.location.href;
+      let currentLocation = window.location.href;
       subText = currentLocation;
     } else {
       subText = channelContainer.querySelector('#text').textContent;
@@ -185,36 +185,36 @@ function buildDlLink(channelContainer) {
 }
 
 function buildChannelButton(channelContainer) {
-  var buttonDiv = buildButtonDiv();
+  let buttonDiv = buildButtonDiv();
 
-  var subLink = buildSubLink(channelContainer);
+  let subLink = buildSubLink(channelContainer);
   buttonDiv.appendChild(subLink);
 
-  var spacer = buildSpacer();
+  let spacer = buildSpacer();
   buttonDiv.appendChild(spacer);
 
-  var dlLink = buildDlLink(channelContainer);
+  let dlLink = buildDlLink(channelContainer);
   buttonDiv.appendChild(dlLink);
 
   return buttonDiv;
 }
 
 function getChannelContainers() {
-  var nodes = document.querySelectorAll('#inner-header-container, #owner');
+  let nodes = document.querySelectorAll('#inner-header-container, #owner');
   return nodes;
 }
 
 function getThubnailContainers() {
-  var nodes = document.querySelectorAll('#thumbnail');
+  let nodes = document.querySelectorAll('#thumbnail');
   return nodes;
 }
 
 function buildVideoButton(thumbContainer) {
-  var thumbLink = thumbContainer?.href;
+  let thumbLink = thumbContainer?.href;
   if (!thumbLink) return;
   if (thumbLink.includes('list=') || thumbLink.includes('/shorts/')) return;
 
-  var dlButton = document.createElement('a');
+  let dlButton = document.createElement('a');
   dlButton.setAttribute('id', 'ta-video-button');
   dlButton.href = '#';
 
@@ -253,7 +253,7 @@ function buildVideoButton(thumbContainer) {
     transition: 'all 0.3s ease 0.3s',
   });
 
-  var dlIcon = document.createElement('span');
+  let dlIcon = document.createElement('span');
   dlIcon.innerHTML = downloadIcon;
   Object.assign(dlIcon.style, {
     filter: 'invert()',
@@ -290,21 +290,21 @@ function adjustOwner(channelContainer) {
 }
 
 function ensureTALinks() {
-  var channelContainerNodes = getChannelContainers();
+  let channelContainerNodes = getChannelContainers();
 
-  for (var channelContainer of channelContainerNodes) {
+  for (let channelContainer of channelContainerNodes) {
     channelContainer = adjustOwner(channelContainer);
     if (channelContainer.hasTA) continue;
-    var channelButton = buildChannelButton(channelContainer);
+    let channelButton = buildChannelButton(channelContainer);
     channelContainer.appendChild(channelButton);
     channelContainer.hasTA = true;
   }
 
-  var thumbContainerNodes = getThubnailContainers();
+  let thumbContainerNodes = getThubnailContainers();
 
-  for (var thumbContainer of thumbContainerNodes) {
+  for (let thumbContainer of thumbContainerNodes) {
     if (thumbContainer.hasTA) continue;
-    var videoButton = buildVideoButton(thumbContainer);
+    let videoButton = buildVideoButton(thumbContainer);
     if (videoButton == null) continue;
     thumbContainer.parentElement.appendChild(videoButton);
     thumbContainer.hasTA = true;

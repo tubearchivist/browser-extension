@@ -68,7 +68,7 @@ async function sendData(path, payload, method) {
 
 // read access details from storage.local
 async function getAccess() {
-  var storage = await browserType.storage.local.get('access');
+  let storage = await browserType.storage.local.get('access');
 
   return storage.access;
 }
@@ -148,14 +148,14 @@ async function sendCookies() {
   console.log('function sendCookies');
 
   let cookieStores = await browserType.cookies.getAllCookieStores();
-  var cookieLines = [
+  let cookieLines = [
     '# Netscape HTTP Cookie File',
     '# https://curl.haxx.se/rfc/cookie_spec.html',
     '# This is a generated file! Do not edit.\n',
   ];
   for (let i = 0; i < cookieStores.length; i++) {
     const cookieStore = cookieStores[i];
-    var allCookiesStore = await browserType.cookies.getAll({
+    let allCookiesStore = await browserType.cookies.getAll({
       domain: '.youtube.com',
       storeId: cookieStore['id'],
     });
