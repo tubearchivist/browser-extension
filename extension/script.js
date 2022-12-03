@@ -215,6 +215,8 @@ function buildVideoButton(thumbContainer) {
   let thumbLink = thumbContainer?.href;
   if (!thumbLink) return;
   if (thumbLink.includes('list=') || thumbLink.includes('/shorts/')) return;
+  let ggp = thumbContainer?.parentElement?.parentElement;
+  if (ggp?.id !== 'dismissible') return;
 
   let dlButton = document.createElement('a');
   dlButton.setAttribute('id', 'ta-video-button');
@@ -226,14 +228,14 @@ function buildVideoButton(thumbContainer) {
     console.log('download: ' + videoLink);
     sendUrl(videoLink, 'download', dlButton);
   });
-  dlButton.addEventListener('mouseover', e => {
+  ggp.addEventListener('mouseover', () => {
     Object.assign(dlButton.style, {
       opacity: 1,
     });
     let videoTitle = thumbContainer.href;
-    e.target.title = 'TA download: ' + videoTitle;
+    dlButton.title = 'TA download: ' + videoTitle;
   });
-  dlButton.addEventListener('mouseout', () => {
+  ggp.addEventListener('mouseout', () => {
     Object.assign(dlButton.style, {
       opacity: 0,
     });
@@ -252,7 +254,6 @@ function buildVideoButton(thumbContainer) {
     borderRadius: '8px',
     cursor: 'pointer',
     opacity: 0,
-    transition: 'all 0.3s ease 0.3s',
   });
 
   let dlIcon = document.createElement('span');
