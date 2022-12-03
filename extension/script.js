@@ -228,12 +228,12 @@ function buildVideoButton(thumbContainer) {
     console.log('download: ' + videoLink);
     sendUrl(videoLink, 'download', dlButton);
   });
-  ggp.addEventListener('mouseover', e => {
+  ggp.addEventListener('mouseover', () => {
     Object.assign(dlButton.style, {
       opacity: 1,
     });
     let videoTitle = thumbContainer.href;
-    e.target.title = 'TA download: ' + videoTitle;
+    dlButton.title = 'TA download: ' + videoTitle;
   });
   ggp.addEventListener('mouseout', () => {
     Object.assign(dlButton.style, {
