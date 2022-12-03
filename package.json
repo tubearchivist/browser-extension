@@ -1,0 +1,18 @@
+{
+  "name": "tubearchivist-browser-extension",
+  "private": true,
+  "scripts": {
+    "lint": "eslint 'extension/**/*.js'",
+    "format": "prettier --write 'extension/**/*.js'"
+  },
+  "devDependencies": {
+    "eslint": "^8.26.0",
+    "prettier": "^2.7.1",
+    "eslint-config-prettier": "^8.5.0"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "arrowParens": "avoid",
+    "printWidth": 100
+  }
+}

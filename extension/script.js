@@ -2,23 +2,24 @@
 content script running on youtube.com
 */
 
-let browserType = getBrowser();
+'use strict';
 
+let browserType = getBrowser();
 
 // boilerplate to dedect browser type api
 function getBrowser() {
-    if (typeof chrome !== "undefined") {
-        if (typeof browser !== "undefined") {
-            console.log("detected firefox");
-            return browser;
-        } else {
-            console.log("detected chrome");
-            return chrome;
-        }
+  if (typeof chrome !== 'undefined') {
+    if (typeof browser !== 'undefined') {
+      console.log('detected firefox');
+      return browser;
     } else {
-        console.log("failed to dedect browser");
-        throw "browser detection error"
-    };
+      console.log('detected chrome');
+      return chrome;
+    }
+  } else {
+    console.log('failed to dedect browser');
+    throw 'browser detection error';
+  }
 }
 
 const downloadIcon = `<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
@@ -100,308 +101,295 @@ viewBox="0 0 500 500" style="enable-background:new 0 0 500 500;" xml:space="pres
    </g>
 </g>
 </g>
-</svg>`
-
+</svg>`;
 
 function buildButtonDiv() {
-    var buttonDiv = document.createElement("div");
-    buttonDiv.setAttribute("id", "ta-channel-button");
+  let buttonDiv = document.createElement('div');
+  buttonDiv.setAttribute('id', 'ta-channel-button');
 
-    Object.assign(buttonDiv.style, {
-        display: "flex",
-        alignItems: "center",
-        backgroundColor: "#00202f",
-        color: "#fff",
-        fontSize: "14px",
-        padding: "5px",
-        margin: "0 5px",
-        borderRadius: "8px",
-    });
-    return buttonDiv
+  Object.assign(buttonDiv.style, {
+    display: 'flex',
+    alignItems: 'center',
+    backgroundColor: '#00202f',
+    color: '#fff',
+    fontSize: '14px',
+    padding: '5px',
+    margin: '0 5px',
+    borderRadius: '8px',
+  });
+  return buttonDiv;
 }
 
 function buildSubLink(channelContainer) {
-    var subLink = document.createElement("span");
-    subLink.innerText = "Subscribe";
-    subLink.addEventListener('click', e => {
-        e.preventDefault();
-        var currentLocation = window.location.href;
-        console.log("subscribe to: " + currentLocation);
-        sendUrl(currentLocation, "subscribe", subLink);
-    });
-    subLink.addEventListener("mouseover", e => {
-        let subText
-        if (window.location.pathname == "/watch") {
-            var currentLocation = window.location.href;
-            subText = currentLocation;
-        } else {
-            subText = channelContainer.querySelector("#text").textContent;
-        };
+  let subLink = document.createElement('span');
+  subLink.innerText = 'Subscribe';
+  subLink.addEventListener('click', e => {
+    e.preventDefault();
+    let currentLocation = window.location.href;
+    console.log('subscribe to: ' + currentLocation);
+    sendUrl(currentLocation, 'subscribe', subLink);
+  });
+  subLink.addEventListener('mouseover', e => {
+    let subText;
+    if (window.location.pathname === '/watch') {
+      let currentLocation = window.location.href;
+      subText = currentLocation;
+    } else {
+      subText = channelContainer.querySelector('#text').textContent;
+    }
 
-        e.target.title = "TA Subscribe: " + subText;
-    });
-    Object.assign(subLink.style, {
-        padding: "5px",
-        cursor: "pointer",
-    });
-    
-    return subLink
+    e.target.title = 'TA Subscribe: ' + subText;
+  });
+  Object.assign(subLink.style, {
+    padding: '5px',
+    cursor: 'pointer',
+  });
+
+  return subLink;
 }
 
 function buildSpacer() {
-    var spacer = document.createElement("span");
-    spacer.innerText = "|";
+  let spacer = document.createElement('span');
+  spacer.innerText = '|';
 
-    return spacer
+  return spacer;
 }
 
 function buildDlLink(channelContainer) {
-    var dlLink = document.createElement("span");
-    dlLink.innerHTML = downloadIcon;
+  let dlLink = document.createElement('span');
+  dlLink.innerHTML = downloadIcon;
 
-    dlLink.addEventListener('click', e => {
-        e.preventDefault();
-        var currentLocation = window.location.href;
-        console.log("download: " + currentLocation)
-        sendUrl(currentLocation, "download", dlLink);
-    });
-    dlLink.addEventListener("mouseover", e => {
-        let subText
-        if (window.location.pathname == "/watch") {
-            var currentLocation = window.location.href;
-            subText = currentLocation;
-        } else {
-            subText = channelContainer.querySelector("#text").textContent;
-        };
+  dlLink.addEventListener('click', e => {
+    e.preventDefault();
+    let currentLocation = window.location.href;
+    console.log('download: ' + currentLocation);
+    sendUrl(currentLocation, 'download', dlLink);
+  });
+  dlLink.addEventListener('mouseover', e => {
+    let subText;
+    if (window.location.pathname === '/watch') {
+      let currentLocation = window.location.href;
+      subText = currentLocation;
+    } else {
+      subText = channelContainer.querySelector('#text').textContent;
+    }
 
-        e.target.title = "TA Download: " + subText;
-    });
-    Object.assign(dlLink.style, {
-        filter: "invert()",
-        width: "20px",
-        padding: "0 5px",
-        cursor: "pointer",
-    });
+    e.target.title = 'TA Download: ' + subText;
+  });
+  Object.assign(dlLink.style, {
+    filter: 'invert()',
+    width: '20px',
+    padding: '0 5px',
+    cursor: 'pointer',
+  });
 
-    return dlLink
+  return dlLink;
 }
 
-
 function buildChannelButton(channelContainer) {
+  let buttonDiv = buildButtonDiv();
 
-    var buttonDiv = buildButtonDiv()
-    
-    var subLink = buildSubLink(channelContainer);
-    buttonDiv.appendChild(subLink)
+  let subLink = buildSubLink(channelContainer);
+  buttonDiv.appendChild(subLink);
 
-    var spacer = buildSpacer()
-    buttonDiv.appendChild(spacer);
+  let spacer = buildSpacer();
+  buttonDiv.appendChild(spacer);
 
-    var dlLink = buildDlLink(channelContainer)
-    buttonDiv.appendChild(dlLink);
+  let dlLink = buildDlLink(channelContainer);
+  buttonDiv.appendChild(dlLink);
 
-    return buttonDiv
-
+  return buttonDiv;
 }
 
 function getChannelContainers() {
-    var nodes = document.querySelectorAll("#inner-header-container, #owner");
-    return nodes
+  let nodes = document.querySelectorAll('#inner-header-container, #owner');
+  return nodes;
 }
 
 function getThubnailContainers() {
-    var nodes = document.querySelectorAll('#thumbnail');
-    return nodes
+  let nodes = document.querySelectorAll('#thumbnail');
+  return nodes;
 }
 
 function buildVideoButton(thumbContainer) {
-    var thumbLink = thumbContainer?.href;
-    if (!thumbLink) return;
-    if (thumbLink.includes('list=') || thumbLink.includes('/shorts/')) return;
+  let thumbLink = thumbContainer?.href;
+  if (!thumbLink) return;
+  if (thumbLink.includes('list=') || thumbLink.includes('/shorts/')) return;
 
-    var dlButton = document.createElement("a");
-    dlButton.setAttribute("id", "ta-video-button");
-    dlButton.href = '#'
+  let dlButton = document.createElement('a');
+  dlButton.setAttribute('id', 'ta-video-button');
+  dlButton.href = '#';
 
-    dlButton.addEventListener('click', e => {
-        e.preventDefault();
-        let videoLink = thumbContainer.href;
-        console.log("download: " + videoLink);
-        sendUrl(videoLink, "download", dlButton)
-    });
-    dlButton.addEventListener('mouseover', e => {
-        Object.assign(dlButton.style, {
-            opacity: 1,
-        });
-        let videoTitle = thumbContainer.href;
-        e.target.title = "TA download: " + videoTitle;
-    })
-    dlButton.addEventListener('mouseout', e => {
-        Object.assign(dlButton.style, {
-            opacity: 0,
-        });
-    })
-
+  dlButton.addEventListener('click', e => {
+    e.preventDefault();
+    let videoLink = thumbContainer.href;
+    console.log('download: ' + videoLink);
+    sendUrl(videoLink, 'download', dlButton);
+  });
+  dlButton.addEventListener('mouseover', e => {
     Object.assign(dlButton.style, {
-        display: "flex",
-        position: "absolute",
-        top: "5px",
-        left: "5px",
-        alignItems: "center",
-        backgroundColor: "#00202f",
-        color: "#fff",
-        fontSize: "1.4rem",
-        textDecoration: "none",
-        borderRadius: "8px",
-        cursor: "pointer",
-        opacity: 0,
-        transition: "all 0.3s ease 0.3s",
+      opacity: 1,
     });
-    
-    var dlIcon = document.createElement("span");
-    dlIcon.innerHTML = downloadIcon;
-    Object.assign(dlIcon.style, {
-        filter: "invert()",
-        width: "20px",
-        padding: "10px 13px",
+    let videoTitle = thumbContainer.href;
+    e.target.title = 'TA download: ' + videoTitle;
+  });
+  dlButton.addEventListener('mouseout', () => {
+    Object.assign(dlButton.style, {
+      opacity: 0,
     });
-    
-    dlButton.appendChild(dlIcon);
+  });
 
-    return dlButton
+  Object.assign(dlButton.style, {
+    display: 'flex',
+    position: 'absolute',
+    top: '5px',
+    left: '5px',
+    alignItems: 'center',
+    backgroundColor: '#00202f',
+    color: '#fff',
+    fontSize: '1.4rem',
+    textDecoration: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    opacity: 0,
+    transition: 'all 0.3s ease 0.3s',
+  });
 
+  let dlIcon = document.createElement('span');
+  dlIcon.innerHTML = downloadIcon;
+  Object.assign(dlIcon.style, {
+    filter: 'invert()',
+    width: '20px',
+    padding: '10px 13px',
+  });
+
+  dlButton.appendChild(dlIcon);
+
+  return dlButton;
 }
-
 
 // fix positioning of #owner div to fit new button
 function adjustOwner(channelContainer) {
-    let sponsorButton = channelContainer.querySelector('#sponsor-button');
-    if (sponsorButton === null) {
-        return channelContainer
-    }
+  let sponsorButton = channelContainer.querySelector('#sponsor-button');
+  if (sponsorButton === null) {
+    return channelContainer;
+  }
 
-    let variableMinWidth
-    if (sponsorButton.hasChildNodes()) {
-        variableMinWidth = '140px';
-    } else {
-        variableMinWidth = '45px';
-    }
+  let variableMinWidth;
+  if (sponsorButton.hasChildNodes()) {
+    variableMinWidth = '140px';
+  } else {
+    variableMinWidth = '45px';
+  }
 
-    Object.assign(channelContainer.firstElementChild.style, {
-        minWidth: variableMinWidth
-    })
-    Object.assign(channelContainer.style, {
-        minWidth: 'calc(40% + 50px)'
-    })
-    return channelContainer
+  Object.assign(channelContainer.firstElementChild.style, {
+    minWidth: variableMinWidth,
+  });
+  Object.assign(channelContainer.style, {
+    minWidth: 'calc(40% + 50px)',
+  });
+  return channelContainer;
 }
-
 
 function ensureTALinks() {
+  let channelContainerNodes = getChannelContainers();
 
-    var channelContainerNodes = getChannelContainers()
+  for (let channelContainer of channelContainerNodes) {
+    channelContainer = adjustOwner(channelContainer);
+    if (channelContainer.hasTA) continue;
+    let channelButton = buildChannelButton(channelContainer);
+    channelContainer.appendChild(channelButton);
+    channelContainer.hasTA = true;
+  }
 
-    for (var channelContainer of channelContainerNodes) {
-        channelContainer = adjustOwner(channelContainer);
-        if (channelContainer.hasTA) continue;
-        var channelButton = buildChannelButton(channelContainer);
-        channelContainer.appendChild(channelButton);
-        channelContainer.hasTA = true;
-    }
+  let thumbContainerNodes = getThubnailContainers();
 
-    var thumbContainerNodes = getThubnailContainers();
-
-    for (var thumbContainer of thumbContainerNodes) {
-        if (thumbContainer.hasTA) continue;
-        var videoButton = buildVideoButton(thumbContainer);
-        if (videoButton == null) continue;
-        thumbContainer.parentElement.appendChild(videoButton);
-        thumbContainer.hasTA = true;
-    }
-
+  for (let thumbContainer of thumbContainerNodes) {
+    if (thumbContainer.hasTA) continue;
+    let videoButton = buildVideoButton(thumbContainer);
+    if (videoButton == null) continue;
+    thumbContainer.parentElement.appendChild(videoButton);
+    thumbContainer.hasTA = true;
+  }
 }
 
-
 function buttonError(button) {
-    let buttonSpan = button.querySelector("span");
-    if (buttonSpan === null) {
-        buttonSpan = button
-    }
-    buttonSpan.style.filter = "invert(19%) sepia(93%) saturate(7472%) hue-rotate(359deg) brightness(105%) contrast(113%)";
-    buttonSpan.style.color = "red";
+  let buttonSpan = button.querySelector('span');
+  if (buttonSpan === null) {
+    buttonSpan = button;
+  }
+  buttonSpan.style.filter =
+    'invert(19%) sepia(93%) saturate(7472%) hue-rotate(359deg) brightness(105%) contrast(113%)';
+  buttonSpan.style.color = 'red';
 
-    button.style.opacity = 1;
-    button.addEventListener('mouseout', e => {
-        Object.assign(button.style, {
-            opacity: 1,
-        });
-    })
+  button.style.opacity = 1;
+  button.addEventListener('mouseout', () => {
+    Object.assign(button.style, {
+      opacity: 1,
+    });
+  });
 }
 
 function buttonSuccess(button) {
-    let buttonSpan = button.querySelector("span");
-    if (buttonSpan === null) {
-        buttonSpan = button;
-    }
-    if (buttonSpan.innerHTML === "Subscribe") {
-        buttonSpan.innerHTML = "Success";
-        setTimeout(() => {
-            buttonSpan.innerHTML = "Subscribe";
-        }, 2000);
-    } else {
-        buttonSpan.innerHTML = checkmarkIcon;
-        setTimeout(() => {
-            buttonSpan.innerHTML = downloadIcon;
-        }, 2000);
-    }
+  let buttonSpan = button.querySelector('span');
+  if (buttonSpan === null) {
+    buttonSpan = button;
+  }
+  if (buttonSpan.innerHTML === 'Subscribe') {
+    buttonSpan.innerHTML = 'Success';
+    setTimeout(() => {
+      buttonSpan.innerHTML = 'Subscribe';
+    }, 2000);
+  } else {
+    buttonSpan.innerHTML = checkmarkIcon;
+    setTimeout(() => {
+      buttonSpan.innerHTML = downloadIcon;
+    }, 2000);
+  }
 }
 
-
 function sendUrl(url, action, button) {
-
-    function handleResponse(message) {
-        console.log("sendUrl response: " + JSON.stringify(message));
-        if (message === null || message.detail === "Invalid token.") {
-            buttonError(button);
-        } else {
-            buttonSuccess(button);
-        }
+  function handleResponse(message) {
+    console.log('sendUrl response: ' + JSON.stringify(message));
+    if (message === null || message.detail === 'Invalid token.') {
+      buttonError(button);
+    } else {
+      buttonSuccess(button);
     }
+  }
 
-    function handleError(error) {
-        console.log("error");
-        console.log(JSON.stringify(error));
-    }
+  function handleError(error) {
+    console.log('error');
+    console.log(JSON.stringify(error));
+  }
 
-    let payload = {
-        "youtube": {
-            "url": url,
-            "action": action,
-        }
-    }
+  let payload = {
+    youtube: {
+      url: url,
+      action: action,
+    },
+  };
 
-    console.log("youtube link: " + JSON.stringify(payload));
+  console.log('youtube link: ' + JSON.stringify(payload));
 
-    let sending = browserType.runtime.sendMessage(payload);
-    sending.then(handleResponse, handleError);
-
-};
-
+  let sending = browserType.runtime.sendMessage(payload);
+  sending.then(handleResponse, handleError);
+}
 
 let throttleBlock;
 const throttle = (callback, time) => {
-    if (throttleBlock) return;
-    throttleBlock = true;
-    setTimeout(() => {
-        callback();
-        throttleBlock = false;
-    }, time);
+  if (throttleBlock) return;
+  throttleBlock = true;
+  setTimeout(() => {
+    callback();
+    throttleBlock = false;
+  }, time);
 };
 
 let observer = new MutationObserver(list => {
-    if (list.some(i => i.type === 'childList' && i.addedNodes.length > 0)) {
-        throttle(ensureTALinks, 700);
-    }
+  if (list.some(i => i.type === 'childList' && i.addedNodes.length > 0)) {
+    throttle(ensureTALinks, 700);
+  }
 });
 
 observer.observe(document.body, { attributes: false, childList: true, subtree: true });

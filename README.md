@@ -78,3 +78,6 @@ Join us on [Discord](https://www.tubearchivist.com/discord) and help us improve 
 - [ ] Implement download button for videos on playlist
 - [ ] Error handling for connection errors
 - [X] Dynamically inject buttons with mutation observer
+
+## Making changes to the JavaScript
+The JavaScript does not require any build step; you just edit the files directly. However, there is config for eslint and prettier (a linter and formatter respectively); their use is recommended but not required. To use them, install `node`, run `npm i` from the root directory of this repository to install dependencies, then run `npm run lint` and `npm run format` to run eslint and prettier respectively.

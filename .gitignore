@@ -3,3 +3,6 @@ extension/manifest.json
 
 # release builds
 release/*
+
+# JavaScript stuff
+node_modules
