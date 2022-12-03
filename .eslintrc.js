@@ -7,6 +7,10 @@ module.exports = {
   env: {
     browser: true,
   },
+  globals: {
+    browser: 'readonly',
+    chrome: 'readonly',
+  },
   rules: {
     strict: ['error', 'global'],
     'no-unused-vars': ['error', { vars: 'local' }],

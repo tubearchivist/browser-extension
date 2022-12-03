@@ -2,6 +2,8 @@
 content script running on youtube.com
 */
 
+'use strict';
+
 let browserType = getBrowser();
 
 // boilerplate to dedect browser type api
@@ -129,7 +131,7 @@ function buildSubLink(channelContainer) {
   });
   subLink.addEventListener('mouseover', e => {
     let subText;
-    if (window.location.pathname == '/watch') {
+    if (window.location.pathname === '/watch') {
       let currentLocation = window.location.href;
       subText = currentLocation;
     } else {
@@ -165,7 +167,7 @@ function buildDlLink(channelContainer) {
   });
   dlLink.addEventListener('mouseover', e => {
     let subText;
-    if (window.location.pathname == '/watch') {
+    if (window.location.pathname === '/watch') {
       let currentLocation = window.location.href;
       subText = currentLocation;
     } else {
@@ -231,7 +233,7 @@ function buildVideoButton(thumbContainer) {
     let videoTitle = thumbContainer.href;
     e.target.title = 'TA download: ' + videoTitle;
   });
-  dlButton.addEventListener('mouseout', e => {
+  dlButton.addEventListener('mouseout', () => {
     Object.assign(dlButton.style, {
       opacity: 0,
     });
@@ -321,7 +323,7 @@ function buttonError(button) {
   buttonSpan.style.color = 'red';
 
   button.style.opacity = 1;
-  button.addEventListener('mouseout', e => {
+  button.addEventListener('mouseout', () => {
     Object.assign(button.style, {
       opacity: 1,
     });

@@ -2,6 +2,8 @@
 Loaded into popup index.html
 */
 
+'use strict';
+
 let browserType = getBrowser();
 
 // boilerplate to dedect browser type api
@@ -124,7 +126,7 @@ function setCookieState() {
 // change status icon based on connection status
 function setStatusIcon(connected) {
   let statusIcon = document.getElementById('status-icon');
-  if (connected == true) {
+  if (connected) {
     statusIcon.innerHTML = '&#9745;';
     statusIcon.style.color = 'green';
   } else {
@@ -159,10 +161,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     console.log('set options: ' + JSON.stringify(result));
     setCookieState();
-  }
-
-  function onError(error) {
-    console.log(`Error: ${error}`);
   }
 
   browserType.storage.local.get('access', function (result) {

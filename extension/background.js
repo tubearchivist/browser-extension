@@ -2,6 +2,8 @@
 extension background script listening for events
 */
 
+'use strict';
+
 console.log('running background.js');
 
 let browserType = getBrowser();
