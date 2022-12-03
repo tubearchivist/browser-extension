@@ -71,7 +71,7 @@ Use the correct manifest file for your browser. Either rename the browser specif
 - For testing this extension between releases, use the *unstable* builds of Tube Archivist, only for your testing environment.
 
 ## Roadmap
-Join us on [Discord](https://discord.gg/AFwz8nE7BK) and help us improve and extend this project. This is a list of planned features, in no particular order:
+Join us on [Discord](https://www.tubearchivist.com/discord) and help us improve and extend this project. This is a list of planned features, in no particular order:
 - [ ] Get download and subscribe status from TA to show on the injected buttons
 - [ ] Implement download button for videos on the YouTube homepage over inline preview
 - [ ] Implement download/subscribe button for playlists
