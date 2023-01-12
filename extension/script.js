@@ -214,7 +214,7 @@ function getThubnailContainers() {
 function buildVideoButton(thumbContainer) {
   let thumbLink = thumbContainer?.href;
   if (!thumbLink) return;
-  if (thumbLink.includes('list=') || thumbLink.includes('/shorts/')) return;
+  if (thumbLink.includes('list=')) return;
   let ggp = thumbContainer?.parentElement?.parentElement;
   if (ggp?.id !== 'dismissible') return;
 
