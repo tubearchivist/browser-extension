@@ -171,7 +171,7 @@ function buildDlLink(channelContainer) {
     if (window.location.pathname === '/watch') {
       subText = currentLocation;
     } else {
-      subText = channelContainer.querySelector('#text').textContent + " " + currentLocation;
+      subText = channelContainer.querySelector('#text').textContent + ' ' + currentLocation;
     }
 
     e.target.title = 'TA Download: ' + subText;
@@ -373,8 +373,8 @@ function sendUrl(url, action, button) {
 
   console.log('youtube link: ' + JSON.stringify(payload));
 
-  // let sending = browserType.runtime.sendMessage(payload);
-  // sending.then(handleResponse, handleError);
+  let sending = browserType.runtime.sendMessage(payload);
+  sending.then(handleResponse, handleError);
 }
 
 let throttleBlock;
