@@ -10,7 +10,7 @@
 This is a browser extension to bridge YouTube with [Tube Archivist](https://github.com/tubearchivist/tubearchivist), your self hosted YouTube media server.
 - Add your Tube Archivist connection details in the addon popup.
 - On YouTube video pages, inject a download button to download that video and a subscribe button to subscribe to that channel.
-- On YouTube channel pages, inject a button to subscribe to the channel or download the complete channel.
+- On YouTube channel pages, inject a button to subscribe to the channel or download the complete channel. Regarding the channel subpages, this follows the same rules as adding to the queue over the form.
 - Throughout most places, hover over the top left corner of a video thumbnail to reveal a download button for that video.
 - Sync your cookies for yt-dlp.
 
