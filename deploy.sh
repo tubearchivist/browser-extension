@@ -8,6 +8,9 @@ if [[ $(basename "$(pwd)") != 'tubearchivist_browserextension' ]]; then
     exit 1
 fi
 
+echo "latest tags:"
+git tag | tail -n 5 | sort -r
+
 printf "\ncreate new version:\n"
 read -r VERSION
 
