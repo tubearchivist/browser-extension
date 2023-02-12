@@ -87,10 +87,16 @@ async function getCookieState() {
 // send ping to server, return response
 async function verifyConnection() {
   const path = 'api/ping/';
-  let response = await sendGet(path);
-  console.log('verify connection: ' + JSON.stringify(response));
+  let message = await sendGet(path);
+  console.log('verify connection: ' + JSON.stringify(message));
 
-  return response;
+  if (message?.response === 'pong') {
+    return true;
+  } else if (message?.detail) {
+    throw new Error(message.detail);
+  } else {
+    throw new Error(`got unknown message ${JSON.stringify(message)}`);
+  }
 }
 
 // send youtube link from injected buttons

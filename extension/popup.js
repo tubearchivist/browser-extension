@@ -103,15 +103,8 @@ function sendCookie() {
 function pingBackend() {
   clearError();
   function handleResponse(message) {
-    // TODO move this check into background.js
-    if (message?.response === 'pong') {
-      setStatusIcon(true);
-      console.log('connection validated');
-    } else if (message?.detail) {
-      handleError(message.detail);
-    } else {
-      handleError(`got unknown message ${JSON.stringify(message)}`);
-    }
+    console.log('connection validated');
+    setStatusIcon(true);
   }
 
   function handleError(error) {
