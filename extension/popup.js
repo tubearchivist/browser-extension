@@ -102,7 +102,7 @@ function sendCookie() {
 // send ping message to TA backend
 function pingBackend() {
   clearError();
-  function handleResponse(message) {
+  function handleResponse() {
     console.log('connection validated');
     setStatusIcon(true);
   }

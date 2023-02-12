@@ -373,7 +373,7 @@ function sendUrl(url, action, button) {
     buttonError(button);
   }
 
-  let message = { type: 'youtube', action, url };
+  let message = { type: action, url };
 
   console.log('youtube link: ' + JSON.stringify(message));
 

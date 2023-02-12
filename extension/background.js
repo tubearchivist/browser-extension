@@ -84,7 +84,7 @@ async function getCookieState() {
   return response;
 }
 
-// send ping to server, return response
+// send ping to server
 async function verifyConnection() {
   const path = 'api/ping/';
   let message = await sendGet(path);
@@ -100,34 +100,34 @@ async function verifyConnection() {
 }
 
 // send youtube link from injected buttons
-async function youtubeLink(youtubeMessage) {
-  let path;
-  let payload;
-
-  if (youtubeMessage.action === 'download') {
-    path = 'api/download/';
-    payload = {
+async function download(url) {
+  return await sendData(
+    'api/download/',
+    {
       data: [
         {
-          youtube_id: youtubeMessage.url,
+          youtube_id: url,
           status: 'pending',
         },
       ],
-    };
-  } else if (youtubeMessage.action === 'subscribe') {
-    path = 'api/channel/';
-    payload = {
+    },
+    'POST'
+  );
+}
+
+async function subscribe(url) {
+  return await sendData(
+    'api/channel/',
+    {
       data: [
         {
-          channel_id: youtubeMessage.url,
+          channel_id: url,
           channel_subscribed: true,
         },
       ],
-    };
-  }
-
-  let response = await sendData(path, payload, 'POST');
-  return response;
+    },
+    'POST'
+  );
 }
 
 async function cookieStr(cookieLines) {
@@ -185,7 +185,8 @@ type Message =
   | { type: 'verify' }
   | { type: 'cookieState' }
   | { type: 'sendCookie' }
-  | { type: 'youtube', action: 'download' | 'subscribe', url: string }
+  | { type: 'download', url: string }
+  | { type: 'subscribe', url: string }
 */
 function handleMessage(request, sender, sendResponse) {
   console.log('message background.js listener got message', request);
@@ -204,9 +205,11 @@ function handleMessage(request, sender, sendResponse) {
       case 'sendCookie': {
         return await sendCookies();
       }
-      case 'youtube': {
-        // TODO split this up
-        return await youtubeLink(request.youtube);
+      case 'download': {
+        return await download(request.url);
+      }
+      case 'subscribe': {
+        return await subscribe(request.url);
       }
       default: {
         let err = new Error(`unknown message type ${JSON.stringify(request.type)}`);
