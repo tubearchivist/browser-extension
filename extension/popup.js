@@ -15,9 +15,17 @@ function getBrowser() {
       return chrome;
     }
   } else {
-    console.log('failed to dedect browser');
+    console.log('failed to detect browser');
     throw 'browser detection error';
   }
+}
+
+async function sendMessage(message) {
+  let { success, value } = await browserType.runtime.sendMessage(message);
+  if (!success) {
+    throw value;
+  }
+  return value;
 }
 
 // store access details
@@ -75,7 +83,7 @@ function sendCookie() {
   if (checked === false) {
     return;
   }
-  let sending = browserType.runtime.sendMessage({ sendCookie: true });
+  let sending = sendMessage({ type: 'sendCookie' });
   sending.then(handleResponse, handleError);
 }
 
@@ -89,12 +97,12 @@ function pingBackend() {
   }
 
   function handleError(error) {
-    console.log(`Error: ${error}`);
+    console.log(`Verify got error: ${error}`);
     setStatusIcon(false);
   }
 
   console.log('ping TA server');
-  let sending = browserType.runtime.sendMessage({ verify: true });
+  let sending = sendMessage({ type: 'verify' });
   sending.then(handleResponse, handleError);
 }
 
@@ -118,7 +126,7 @@ function setCookieState() {
   }
 
   console.log('set cookie state');
-  let sending = browserType.runtime.sendMessage({ cookieState: true });
+  let sending = sendMessage({ type: 'cookieState' });
   sending.then(handleResponse, handleError);
   document.getElementById('sendCookies').checked = true;
 }

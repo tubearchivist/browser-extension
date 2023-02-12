@@ -22,6 +22,14 @@ function getBrowser() {
   }
 }
 
+async function sendMessage(message) {
+  let { success, value } = await browserType.runtime.sendMessage(message);
+  if (!success) {
+    throw value;
+  }
+  return value;
+}
+
 const downloadIcon = `<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 viewBox="0 0 500 500" style="enable-background:new 0 0 500 500;" xml:space="preserve">
 <style type="text/css">
@@ -362,18 +370,14 @@ function sendUrl(url, action, button) {
   function handleError(error) {
     console.log('error');
     console.log(JSON.stringify(error));
+    buttonError(button);
   }
 
-  let payload = {
-    youtube: {
-      url: url,
-      action: action,
-    },
-  };
+  let message = { type: 'youtube', action, url };
 
-  console.log('youtube link: ' + JSON.stringify(payload));
+  console.log('youtube link: ' + JSON.stringify(message));
 
-  let sending = browserType.runtime.sendMessage(payload);
+  let sending = sendMessage(message);
   sending.then(handleResponse, handleError);
 }
 

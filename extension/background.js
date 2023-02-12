@@ -172,33 +172,45 @@ async function sendCookies() {
   return response;
 }
 
-// process and return message if needed
+/*
+process and return message if needed
+the following messages are supported:
+type Message =
+  | { type: 'verify' }
+  | { type: 'cookieState' }
+  | { type: 'sendCookie' }
+  | { type: 'youtube', action: 'download' | 'subscribe', url: string }
+*/
 function handleMessage(request, sender, sendResponse) {
-  console.log('message background.js listener: ' + JSON.stringify(request));
+  console.log('message background.js listener got message', request);
 
-  if (request.verify === true) {
-    let response = verifyConnection();
-    response.then(message => {
-      sendResponse(message);
-    });
-  } else if (request.youtube) {
-    let response = youtubeLink(request.youtube);
-    response.then(message => {
-      sendResponse(message);
-    });
-  } else if (request.cookieState) {
-    let response = getCookieState();
-    response.then(message => {
-      sendResponse(message);
-    });
-  } else if (request.sendCookie) {
-    console.log('backgound: ' + JSON.stringify(request));
-    let response = sendCookies();
-    response.then(message => {
-      sendResponse(message);
-    });
-  }
-
+  // this function must return the value `true` in chrome to signal the response will be async;
+  // it cannot return a promise
+  // so in order to use async/await, we need a wrapper
+  (async () => {
+    switch (request.type) {
+      case 'verify': {
+        return await verifyConnection();
+      }
+      case 'cookieState': {
+        return await getCookieState();
+      }
+      case 'sendCookie': {
+        return await sendCookies();
+      }
+      case 'youtube': {
+        // TODO split this up
+        return await youtubeLink(request.youtube);
+      }
+      default: {
+        let err = new Error(`unknown message type ${JSON.stringify(request.type)}`);
+        console.log(err);
+        throw err;
+      }
+    }
+  })()
+    .then(value => sendResponse({ success: true, value }))
+    .catch(e => sendResponse({ success: false, value: e.message }));
   return true;
 }
 
