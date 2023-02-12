@@ -44,18 +44,23 @@ document.getElementById('save-login').addEventListener('click', function () {
   if (!url.includes('://')) {
     url = 'http://' + url;
   }
-  let parsed = new URL(url);
-  let toStore = {
-    access: {
-      url: `${parsed.protocol}//${parsed.hostname}`,
-      port: parsed.port || (parsed.protocol === 'https:' ? '443' : '80'),
-      apiKey: document.getElementById('api-key').value,
-    },
-  };
-  browserType.storage.local.set(toStore, function () {
-    console.log('Stored connection details: ' + JSON.stringify(toStore));
-    pingBackend();
-  });
+  try {
+    clearError();
+    let parsed = new URL(url);
+    let toStore = {
+      access: {
+        url: `${parsed.protocol}//${parsed.hostname}`,
+        port: parsed.port || (parsed.protocol === 'https:' ? '443' : '80'),
+        apiKey: document.getElementById('api-key').value,
+      },
+    };
+    browserType.storage.local.set(toStore, function () {
+      console.log('Stored connection details: ' + JSON.stringify(toStore));
+      pingBackend();
+    });
+  } catch (e) {
+    setError(e.message);
+  }
 });
 
 // verify connection status
