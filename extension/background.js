@@ -210,7 +210,15 @@ function handleMessage(request, sender, sendResponse) {
     }
   })()
     .then(value => sendResponse({ success: true, value }))
-    .catch(e => sendResponse({ success: false, value: e.message }));
+    .catch(e => {
+      console.error(e);
+      let message = e?.message ?? e;
+      if (message === 'Failed to fetch') {
+        // chrome's error message for failed `fetch` is not very user-friendly
+        message = 'Could not connect to server';
+      }
+      sendResponse({ success: false, value: message });
+    });
   return true;
 }
 

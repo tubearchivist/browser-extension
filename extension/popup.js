@@ -28,6 +28,16 @@ async function sendMessage(message) {
   return value;
 }
 
+let errorOut = document.getElementById('error-out');
+function setError(message) {
+  errorOut.style.display = 'initial';
+  errorOut.innerText = message;
+}
+
+function clearError() {
+  errorOut.style.display = 'none';
+}
+
 // store access details
 document.getElementById('save-login').addEventListener('click', function () {
   let url = document.getElementById('full-url').value;
@@ -60,6 +70,7 @@ document.getElementById('sendCookies').addEventListener('click', function () {
 
 function sendCookie() {
   console.log('popup send cookie');
+  clearError();
 
   function handleResponse(message) {
     console.log('handle cookie response: ' + JSON.stringify(message));
@@ -69,6 +80,7 @@ function sendCookie() {
 
   function handleError(error) {
     console.log(`Error: ${error}`);
+    setError(error);
   }
 
   let checked = document.getElementById('sendCookies').checked;
@@ -89,16 +101,23 @@ function sendCookie() {
 
 // send ping message to TA backend
 function pingBackend() {
+  clearError();
   function handleResponse(message) {
-    if (message.response === 'pong') {
+    // TODO move this check into background.js
+    if (message?.response === 'pong') {
       setStatusIcon(true);
       console.log('connection validated');
+    } else if (message?.detail) {
+      handleError(message.detail);
+    } else {
+      handleError(`got unknown message ${JSON.stringify(message)}`);
     }
   }
 
   function handleError(error) {
     console.log(`Verify got error: ${error}`);
     setStatusIcon(false);
+    setError(error);
   }
 
   console.log('ping TA server');
@@ -113,6 +132,7 @@ function addUrl(access) {
 }
 
 function setCookieState() {
+  clearError();
   function handleResponse(message) {
     console.log(message);
     document.getElementById('sendCookies').checked = message.cookie_enabled;
@@ -123,6 +143,7 @@ function setCookieState() {
 
   function handleError(error) {
     console.log(`Error: ${error}`);
+    setError(error);
   }
 
   console.log('set cookie state');
