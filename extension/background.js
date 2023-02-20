@@ -84,44 +84,50 @@ async function getCookieState() {
   return response;
 }
 
-// send ping to server, return response
+// send ping to server
 async function verifyConnection() {
   const path = 'api/ping/';
-  let response = await sendGet(path);
-  console.log('verify connection: ' + JSON.stringify(response));
+  let message = await sendGet(path);
+  console.log('verify connection: ' + JSON.stringify(message));
 
-  return response;
+  if (message?.response === 'pong') {
+    return true;
+  } else if (message?.detail) {
+    throw new Error(message.detail);
+  } else {
+    throw new Error(`got unknown message ${JSON.stringify(message)}`);
+  }
 }
 
 // send youtube link from injected buttons
-async function youtubeLink(youtubeMessage) {
-  let path;
-  let payload;
-
-  if (youtubeMessage.action === 'download') {
-    path = 'api/download/';
-    payload = {
+async function download(url) {
+  return await sendData(
+    'api/download/',
+    {
       data: [
         {
-          youtube_id: youtubeMessage.url,
+          youtube_id: url,
           status: 'pending',
         },
       ],
-    };
-  } else if (youtubeMessage.action === 'subscribe') {
-    path = 'api/channel/';
-    payload = {
+    },
+    'POST'
+  );
+}
+
+async function subscribe(url) {
+  return await sendData(
+    'api/channel/',
+    {
       data: [
         {
-          channel_id: youtubeMessage.url,
+          channel_id: url,
           channel_subscribed: true,
         },
       ],
-    };
-  }
-
-  let response = await sendData(path, payload, 'POST');
-  return response;
+    },
+    'POST'
+  );
 }
 
 async function cookieStr(cookieLines) {
@@ -172,33 +178,56 @@ async function sendCookies() {
   return response;
 }
 
-// process and return message if needed
+/*
+process and return message if needed
+the following messages are supported:
+type Message =
+  | { type: 'verify' }
+  | { type: 'cookieState' }
+  | { type: 'sendCookie' }
+  | { type: 'download', url: string }
+  | { type: 'subscribe', url: string }
+*/
 function handleMessage(request, sender, sendResponse) {
-  console.log('message background.js listener: ' + JSON.stringify(request));
+  console.log('message background.js listener got message', request);
 
-  if (request.verify === true) {
-    let response = verifyConnection();
-    response.then(message => {
-      sendResponse(message);
+  // this function must return the value `true` in chrome to signal the response will be async;
+  // it cannot return a promise
+  // so in order to use async/await, we need a wrapper
+  (async () => {
+    switch (request.type) {
+      case 'verify': {
+        return await verifyConnection();
+      }
+      case 'cookieState': {
+        return await getCookieState();
+      }
+      case 'sendCookie': {
+        return await sendCookies();
+      }
+      case 'download': {
+        return await download(request.url);
+      }
+      case 'subscribe': {
+        return await subscribe(request.url);
+      }
+      default: {
+        let err = new Error(`unknown message type ${JSON.stringify(request.type)}`);
+        console.log(err);
+        throw err;
+      }
+    }
+  })()
+    .then(value => sendResponse({ success: true, value }))
+    .catch(e => {
+      console.error(e);
+      let message = e?.message ?? e;
+      if (message === 'Failed to fetch') {
+        // chrome's error message for failed `fetch` is not very user-friendly
+        message = 'Could not connect to server';
+      }
+      sendResponse({ success: false, value: message });
     });
-  } else if (request.youtube) {
-    let response = youtubeLink(request.youtube);
-    response.then(message => {
-      sendResponse(message);
-    });
-  } else if (request.cookieState) {
-    let response = getCookieState();
-    response.then(message => {
-      sendResponse(message);
-    });
-  } else if (request.sendCookie) {
-    console.log('backgound: ' + JSON.stringify(request));
-    let response = sendCookies();
-    response.then(message => {
-      sendResponse(message);
-    });
-  }
-
   return true;
 }
 

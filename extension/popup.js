@@ -15,9 +15,27 @@ function getBrowser() {
       return chrome;
     }
   } else {
-    console.log('failed to dedect browser');
+    console.log('failed to detect browser');
     throw 'browser detection error';
   }
+}
+
+async function sendMessage(message) {
+  let { success, value } = await browserType.runtime.sendMessage(message);
+  if (!success) {
+    throw value;
+  }
+  return value;
+}
+
+let errorOut = document.getElementById('error-out');
+function setError(message) {
+  errorOut.style.display = 'initial';
+  errorOut.innerText = message;
+}
+
+function clearError() {
+  errorOut.style.display = 'none';
 }
 
 // store access details
@@ -26,18 +44,23 @@ document.getElementById('save-login').addEventListener('click', function () {
   if (!url.includes('://')) {
     url = 'http://' + url;
   }
-  let parsed = new URL(url);
-  let toStore = {
-    access: {
-      url: `${parsed.protocol}//${parsed.hostname}`,
-      port: parsed.port || (parsed.protocol === 'https:' ? '443' : '80'),
-      apiKey: document.getElementById('api-key').value,
-    },
-  };
-  browserType.storage.local.set(toStore, function () {
-    console.log('Stored connection details: ' + JSON.stringify(toStore));
-    pingBackend();
-  });
+  try {
+    clearError();
+    let parsed = new URL(url);
+    let toStore = {
+      access: {
+        url: `${parsed.protocol}//${parsed.hostname}`,
+        port: parsed.port || (parsed.protocol === 'https:' ? '443' : '80'),
+        apiKey: document.getElementById('api-key').value,
+      },
+    };
+    browserType.storage.local.set(toStore, function () {
+      console.log('Stored connection details: ' + JSON.stringify(toStore));
+      pingBackend();
+    });
+  } catch (e) {
+    setError(e.message);
+  }
 });
 
 // verify connection status
@@ -52,6 +75,7 @@ document.getElementById('sendCookies').addEventListener('click', function () {
 
 function sendCookie() {
   console.log('popup send cookie');
+  clearError();
 
   function handleResponse(message) {
     console.log('handle cookie response: ' + JSON.stringify(message));
@@ -61,6 +85,7 @@ function sendCookie() {
 
   function handleError(error) {
     console.log(`Error: ${error}`);
+    setError(error);
   }
 
   let checked = document.getElementById('sendCookies').checked;
@@ -75,26 +100,26 @@ function sendCookie() {
   if (checked === false) {
     return;
   }
-  let sending = browserType.runtime.sendMessage({ sendCookie: true });
+  let sending = sendMessage({ type: 'sendCookie' });
   sending.then(handleResponse, handleError);
 }
 
 // send ping message to TA backend
 function pingBackend() {
-  function handleResponse(message) {
-    if (message.response === 'pong') {
-      setStatusIcon(true);
-      console.log('connection validated');
-    }
+  clearError();
+  function handleResponse() {
+    console.log('connection validated');
+    setStatusIcon(true);
   }
 
   function handleError(error) {
-    console.log(`Error: ${error}`);
+    console.log(`Verify got error: ${error}`);
     setStatusIcon(false);
+    setError(error);
   }
 
   console.log('ping TA server');
-  let sending = browserType.runtime.sendMessage({ verify: true });
+  let sending = sendMessage({ type: 'verify' });
   sending.then(handleResponse, handleError);
 }
 
@@ -105,6 +130,7 @@ function addUrl(access) {
 }
 
 function setCookieState() {
+  clearError();
   function handleResponse(message) {
     console.log(message);
     document.getElementById('sendCookies').checked = message.cookie_enabled;
@@ -115,10 +141,11 @@ function setCookieState() {
 
   function handleError(error) {
     console.log(`Error: ${error}`);
+    setError(error);
   }
 
   console.log('set cookie state');
-  let sending = browserType.runtime.sendMessage({ cookieState: true });
+  let sending = sendMessage({ type: 'cookieState' });
   sending.then(handleResponse, handleError);
   document.getElementById('sendCookies').checked = true;
 }
