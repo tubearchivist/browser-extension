@@ -122,7 +122,7 @@ function buildButtonDiv() {
     color: '#fff',
     fontSize: '14px',
     padding: '5px',
-    margin: '0 5px',
+    margin: '5px',
     borderRadius: '8px',
   });
   return buttonDiv;
@@ -268,8 +268,8 @@ function buildVideoButton(thumbContainer) {
   dlIcon.innerHTML = downloadIcon;
   Object.assign(dlIcon.style, {
     filter: 'invert()',
-    width: '20px',
-    padding: '10px 13px',
+    width: '18px',
+    padding: '7px 8px',
   });
 
   dlButton.appendChild(dlIcon);
