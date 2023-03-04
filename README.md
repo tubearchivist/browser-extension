@@ -76,7 +76,7 @@ Join us on [Discord](https://www.tubearchivist.com/discord) and help us improve 
 - [ ] Implement download button for videos on the YouTube homepage over inline preview
 - [ ] Implement download/subscribe button for playlists
 - [ ] Implement download button for videos on playlist
-- [ ] Error handling for connection errors
+- [X] Error handling for connection errors
 - [X] Dynamically inject buttons with mutation observer
 
 ## Making changes to the JavaScript
