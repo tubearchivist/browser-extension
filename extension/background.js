@@ -101,8 +101,13 @@ async function verifyConnection() {
 
 // send youtube link from injected buttons
 async function download(url) {
+  let apiURL = 'api/download/';
+  let autostart = await browserType.storage.local.get('autostart');
+  if (Object.keys(autostart).length > 0 && autostart.autostart.checked) {
+    apiURL += '?autostart=true';
+  }
   return await sendData(
-    'api/download/',
+    apiURL,
     {
       data: [
         {

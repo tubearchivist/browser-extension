@@ -63,7 +63,7 @@ hr {
     color: #00202f;
 }
 .options {
-    display: flex;
+    display: block;
     padding-bottom: 10px;
 }
 .options span {

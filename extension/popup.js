@@ -73,6 +73,11 @@ document.getElementById('sendCookies').addEventListener('click', function () {
   sendCookie();
 });
 
+// autostart
+document.getElementById('autostart').addEventListener('click', function () {
+  toggleAutostart();
+});
+
 function sendCookie() {
   console.log('popup send cookie');
   clearError();
@@ -102,6 +107,18 @@ function sendCookie() {
   }
   let sending = sendMessage({ type: 'sendCookie' });
   sending.then(handleResponse, handleError);
+}
+
+function toggleAutostart() {
+  let checked = document.getElementById('autostart').checked;
+  let toStore = {
+    autostart: {
+      checked: checked,
+    },
+  };
+  browserType.storage.local.set(toStore, function () {
+    console.log('stored option: ' + JSON.stringify(toStore));
+  });
 }
 
 // send ping message to TA backend
@@ -190,11 +207,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     setCookieState();
   }
 
+  function setAutostartOption(result) {
+    console.log(result);
+    if (!result.autostart || result.autostart.checked === false) {
+      console.log('autostart not set');
+      return;
+    }
+    console.log('set options: ' + JSON.stringify(result));
+    document.getElementById('autostart').checked = true;
+  }
+
   browserType.storage.local.get('access', function (result) {
     onGot(result);
   });
 
   browserType.storage.local.get('sendCookies', function (result) {
     setCookiesOptions(result);
+  });
+
+  browserType.storage.local.get('autostart', function (result) {
+    setAutostartOption(result);
   });
 });
