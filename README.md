@@ -51,7 +51,7 @@ A green checkmark will appear next to the *Save* button if your connection is wo
 
 ## Options
 - **Sync YouTube cookies**: Send your cookies to TubeArchivist to use for yt-dlp requests.
-- **Autostart**: Autostart and prioritize videos end from this extension.
+- **Autostart**: Autostart and prioritize videos send from this extension.
 
 ## Test this extension
 Use the correct manifest file for your browser. Either rename the browser specific file to `manifest.json` before loading the addon or symlink it to the correct location, e.g. `ln -s manifest-firefox.json manifest.json`.
