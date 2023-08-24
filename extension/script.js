@@ -111,6 +111,8 @@ viewBox="0 0 500 500" style="enable-background:new 0 0 500 500;" xml:space="pres
 </g>
 </svg>`;
 
+const defaultIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>minus-thick</title><path d="M20 14H4V10H20" /></svg>`;
+
 function buildButtonDiv() {
   let buttonDiv = document.createElement('div');
   buttonDiv.setAttribute('id', 'ta-channel-button');
@@ -284,6 +286,7 @@ function processTitle(titleContainer) {
   titleContainer.addEventListener('mouseover', () => {
     const taButton = titleContainer.querySelector('.ta-button');
     if (!taButton) return;
+    if (!taButton.isChecked) checkVideoExists(taButton);
     taButton.style.opacity = 1;
   });
 
@@ -292,6 +295,26 @@ function processTitle(titleContainer) {
     if (!taButton) return;
     taButton.style.opacity = 0;
   });
+}
+
+function checkVideoExists(taButton) {
+  function handleResponse(message) {
+    let buttonSpan = taButton.querySelector('span');
+    if (message) {
+      buttonSpan.innerHTML = checkmarkIcon;
+    } else {
+      buttonSpan.innerHTML = downloadIcon;
+    }
+    taButton.isChecked = true;
+  }
+  function handleError() {
+    console.log('error');
+  }
+
+  let videoId = taButton.dataset.id;
+  let message = { type: 'videoExists', videoId };
+  let sending = sendMessage(message);
+  sending.then(handleResponse, handleError);
 }
 
 function buildVideoButton(titleContainer) {
@@ -323,7 +346,7 @@ function buildVideoButton(titleContainer) {
   });
 
   let dlIcon = document.createElement('span');
-  dlIcon.innerHTML = downloadIcon;
+  dlIcon.innerHTML = defaultIcon;
   Object.assign(dlIcon.style, {
     filter: 'invert()',
     width: '18px',
@@ -375,9 +398,6 @@ function buttonSuccess(button) {
     }, 2000);
   } else {
     buttonSpan.innerHTML = checkmarkIcon;
-    setTimeout(() => {
-      buttonSpan.innerHTML = downloadIcon;
-    }, 2000);
   }
 }
 

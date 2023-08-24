@@ -135,6 +135,13 @@ async function subscribe(url) {
   );
 }
 
+async function videoExists(id) {
+  const path = `api/video/${id}/`;
+  let response = await sendGet(path);
+  console.log(response);
+  return Boolean(response.data);
+}
+
 async function cookieStr(cookieLines) {
   const path = 'api/cookie/';
   let payload = {
@@ -215,6 +222,9 @@ function handleMessage(request, sender, sendResponse) {
       }
       case 'subscribe': {
         return await subscribe(request.url);
+      }
+      case 'videoExists': {
+        return await videoExists(request.videoId);
       }
       default: {
         let err = new Error(`unknown message type ${JSON.stringify(request.type)}`);
