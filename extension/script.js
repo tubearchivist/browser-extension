@@ -283,11 +283,13 @@ function processTitle(titleContainer) {
   titleContainer.classList.add('title-container');
   titleContainer.addEventListener('mouseover', () => {
     const taButton = titleContainer.querySelector('.ta-button');
+    if (!taButton) return;
     taButton.style.opacity = 1;
   });
 
   titleContainer.addEventListener('mouseout', () => {
     const taButton = titleContainer.querySelector('.ta-button');
+    if (!taButton) return;
     taButton.style.opacity = 0;
   });
 }
@@ -300,6 +302,7 @@ function buildVideoButton(titleContainer) {
 
   let params = new URLSearchParams(href);
   let videoId = params.get('/watch?v');
+  if (!videoId) return;
 
   dlButton.setAttribute('data-id', videoId);
   dlButton.setAttribute('data-type', 'video');
@@ -402,6 +405,15 @@ function sendUrl(url, action, button) {
   sending.then(handleResponse, handleError);
 }
 
+function cleanButtons() {
+  console.log('trigger clean buttons');
+  document.querySelectorAll('.ta-button').forEach(button => {
+    button.parentElement.hasTA = false;
+    button.remove();
+  });
+}
+
+let oldHref = document.location.href;
 let throttleBlock;
 const throttle = (callback, time) => {
   if (throttleBlock) return;
@@ -413,6 +425,11 @@ const throttle = (callback, time) => {
 };
 
 let observer = new MutationObserver(list => {
+  const currentHref = document.location.href;
+  if (currentHref !== oldHref) {
+    cleanButtons();
+    oldHref = currentHref;
+  }
   if (list.some(i => i.type === 'childList' && i.addedNodes.length > 0)) {
     throttle(ensureTALinks, 700);
   }
