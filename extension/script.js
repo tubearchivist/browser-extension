@@ -283,14 +283,14 @@ function processTitle(titleContainer) {
   });
 
   titleContainer.classList.add('title-container');
-  titleContainer.addEventListener('mouseover', () => {
+  titleContainer.addEventListener('mouseenter', () => {
     const taButton = titleContainer.querySelector('.ta-button');
     if (!taButton) return;
     if (!taButton.isChecked) checkVideoExists(taButton);
     taButton.style.opacity = 1;
   });
 
-  titleContainer.addEventListener('mouseout', () => {
+  titleContainer.addEventListener('mouseleave', () => {
     const taButton = titleContainer.querySelector('.ta-button');
     if (!taButton) return;
     taButton.style.opacity = 0;
