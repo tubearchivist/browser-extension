@@ -358,15 +358,17 @@ function buildVideoButton(titleContainer) {
 
   dlButton.addEventListener('click', e => {
     e.preventDefault();
-    sendButton(dlButton);
+    sendDownload(dlButton);
     e.stopPropagation();
   });
 
   return dlButton;
 }
 
-function sendButton(button) {
-  console.log(button);
+function sendDownload(button) {
+  let url = button.dataset.id;
+  if (!url) return;
+  sendUrl(url, 'download', button);
 }
 
 function buttonError(button) {
