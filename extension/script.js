@@ -214,67 +214,9 @@ function getChannelContainers() {
   return nodes;
 }
 
-function getThubnailContainers() {
-  let nodes = document.querySelectorAll('#thumbnail');
+function getTitleContainers() {
+  let nodes = document.querySelectorAll('#video-title');
   return nodes;
-}
-
-function buildVideoButton(thumbContainer) {
-  let thumbLink = thumbContainer?.href;
-  if (!thumbLink) return;
-  if (thumbLink.includes('list=')) return;
-  let ggp = thumbContainer?.parentElement?.parentElement;
-  if (ggp?.id !== 'dismissible') return;
-
-  let dlButton = document.createElement('a');
-  dlButton.setAttribute('id', 'ta-video-button');
-  dlButton.href = '#';
-
-  dlButton.addEventListener('click', e => {
-    e.preventDefault();
-    let videoLink = thumbContainer.href;
-    console.log('download: ' + videoLink);
-    sendUrl(videoLink, 'download', dlButton);
-  });
-  ggp.addEventListener('mouseover', () => {
-    Object.assign(dlButton.style, {
-      opacity: 1,
-    });
-    let videoTitle = thumbContainer.href;
-    dlButton.title = 'TA download: ' + videoTitle;
-  });
-  ggp.addEventListener('mouseout', () => {
-    Object.assign(dlButton.style, {
-      opacity: 0,
-    });
-  });
-
-  Object.assign(dlButton.style, {
-    display: 'flex',
-    position: 'absolute',
-    top: '5px',
-    left: '5px',
-    alignItems: 'center',
-    backgroundColor: '#00202f',
-    color: '#fff',
-    fontSize: '1.4rem',
-    textDecoration: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    opacity: 0,
-  });
-
-  let dlIcon = document.createElement('span');
-  dlIcon.innerHTML = downloadIcon;
-  Object.assign(dlIcon.style, {
-    filter: 'invert()',
-    width: '18px',
-    padding: '7px 8px',
-  });
-
-  dlButton.appendChild(dlIcon);
-
-  return dlButton;
 }
 
 // fix positioning of #owner div to fit new button
@@ -311,15 +253,94 @@ function ensureTALinks() {
     channelContainer.hasTA = true;
   }
 
-  let thumbContainerNodes = getThubnailContainers();
-
-  for (let thumbContainer of thumbContainerNodes) {
-    if (thumbContainer.hasTA) continue;
-    let videoButton = buildVideoButton(thumbContainer);
+  let titleContainerNodes = getTitleContainers();
+  for (let titleContainer of titleContainerNodes) {
+    if (titleContainer.hasTA) continue;
+    let videoButton = buildVideoButton(titleContainer);
     if (videoButton == null) continue;
-    thumbContainer.parentElement.appendChild(videoButton);
-    thumbContainer.hasTA = true;
+    processTitle(titleContainer);
+    titleContainer.appendChild(videoButton);
+    titleContainer.hasTA = true;
   }
+}
+
+function getNearestLink(element) {
+  for (let i = 0; i < 5 && element && element !== document; i++) {
+    if (element.tagName === 'A' && element.getAttribute('href') !== '#') {
+      return element.getAttribute('href');
+    }
+    element = element.parentNode;
+  }
+  return null;
+}
+
+function processTitle(titleContainer) {
+  Object.assign(titleContainer.style, {
+    display: 'flex',
+    gap: '15px',
+  });
+
+  titleContainer.classList.add('title-container');
+  titleContainer.addEventListener('mouseover', () => {
+    const taButton = titleContainer.querySelector('.ta-button');
+    taButton.style.opacity = 1;
+  });
+
+  titleContainer.addEventListener('mouseout', () => {
+    const taButton = titleContainer.querySelector('.ta-button');
+    taButton.style.opacity = 0;
+  });
+}
+
+function buildVideoButton(titleContainer) {
+  let href = getNearestLink(titleContainer);
+  const dlButton = document.createElement('a');
+  dlButton.classList.add('ta-button');
+  dlButton.href = '#';
+
+  let params = new URLSearchParams(href);
+  let videoId = params.get('/watch?v');
+
+  dlButton.setAttribute('data-id', videoId);
+  dlButton.setAttribute('data-type', 'video');
+  dlButton.title = `TA download video ${videoId}`;
+
+  Object.assign(dlButton.style, {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#00202f',
+    color: '#fff',
+    fontSize: '1.4rem',
+    textDecoration: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    height: 'fit-content',
+    opacity: 0,
+  });
+
+  let dlIcon = document.createElement('span');
+  dlIcon.innerHTML = downloadIcon;
+  Object.assign(dlIcon.style, {
+    filter: 'invert()',
+    width: '18px',
+    height: '18px',
+    padding: '7px 8px',
+  });
+
+  dlButton.appendChild(dlIcon);
+
+  dlButton.addEventListener('click', e => {
+    e.preventDefault();
+    sendButton(dlButton);
+    e.stopPropagation();
+  });
+
+  return dlButton;
+}
+
+function sendButton(button) {
+  console.log(button);
 }
 
 function buttonError(button) {
