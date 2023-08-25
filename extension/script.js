@@ -165,8 +165,8 @@ function buildChannelButton(channelContainer) {
   let spacer = buildSpacer();
   buttonDiv.appendChild(spacer);
 
-  let dlLink = buildChannelDownloadLink();
-  buttonDiv.appendChild(dlLink);
+  let channelDownloadButton = buildChannelDownloadButton();
+  buttonDiv.appendChild(channelDownloadButton);
 
   return buttonDiv;
 }
@@ -233,36 +233,36 @@ function buildSpacer() {
   return spacer;
 }
 
-function buildChannelDownloadLink() {
-  let dlLink = document.createElement('span');
+function buildChannelDownloadButton() {
+  let channelDownloadButton = document.createElement('span');
   let currentLocation = window.location.href;
   let urlObj = new URL(currentLocation);
 
   if (urlObj.pathname.startsWith('/watch')) {
     let videoId = urlObj.search.split('=')[1];
-    dlLink.setAttribute('data-type', 'video');
-    dlLink.setAttribute('data-id', videoId);
-    dlLink.title = `TA download video: ${videoId}`;
+    channelDownloadButton.setAttribute('data-type', 'video');
+    channelDownloadButton.setAttribute('data-id', videoId);
+    channelDownloadButton.title = `TA download video: ${videoId}`;
   } else {
     let toDownload = urlObj.pathname.slice(1);
-    dlLink.setAttribute('data-id', toDownload);
-    dlLink.setAttribute('data-type', 'channel');
-    dlLink.title = `TA download channel ${toDownload}`;
+    channelDownloadButton.setAttribute('data-id', toDownload);
+    channelDownloadButton.setAttribute('data-type', 'channel');
+    channelDownloadButton.title = `TA download channel ${toDownload}`;
   }
-  dlLink.innerHTML = downloadIcon;
-  dlLink.addEventListener('click', e => {
+  channelDownloadButton.innerHTML = downloadIcon;
+  channelDownloadButton.addEventListener('click', e => {
     e.preventDefault();
     console.log(`download: ${currentLocation}`);
-    sendUrl(currentLocation, 'download', dlLink);
+    sendDownload(channelDownloadButton);
   });
-  Object.assign(dlLink.style, {
+  Object.assign(channelDownloadButton.style, {
     filter: 'invert()',
     width: '20px',
     padding: '0 5px',
     cursor: 'pointer',
   });
 
-  return dlLink;
+  return channelDownloadButton;
 }
 
 function getTitleContainers() {
