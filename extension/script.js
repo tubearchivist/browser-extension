@@ -115,7 +115,7 @@ const defaultIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
 
 function buildButtonDiv() {
   let buttonDiv = document.createElement('div');
-  buttonDiv.setAttribute('id', 'ta-channel-button');
+  buttonDiv.classList.add('ta-channel-button');
 
   Object.assign(buttonDiv.style, {
     display: 'flex',
@@ -130,25 +130,20 @@ function buildButtonDiv() {
   return buttonDiv;
 }
 
-function buildSubLink(channelContainer) {
+function buildSubLink(channelHandle) {
   let subLink = document.createElement('span');
   subLink.innerText = 'Subscribe';
+  subLink.title = `TA Subscribe: ${channelHandle}`;
+  subLink.setAttribute('data-id', channelHandle);
+  subLink.setAttribute('data-type', 'channel');
+
   subLink.addEventListener('click', e => {
     e.preventDefault();
-    let currentLocation = window.location.href;
-    console.log('subscribe to: ' + currentLocation);
-    sendUrl(currentLocation, 'subscribe', subLink);
+    console.log(`subscribe to: ${channelHandle}`);
+    sendUrl(channelHandle, 'subscribe', subLink);
   });
-  subLink.addEventListener('mouseover', e => {
-    let subText;
-    if (window.location.pathname === '/watch') {
-      let currentLocation = window.location.href;
-      subText = currentLocation;
-    } else {
-      subText = channelContainer.querySelector('#text').textContent;
-    }
-
-    e.target.title = 'TA Subscribe: ' + subText;
+  subLink.addEventListener('mouseover', () => {
+    checkChannelSubscribed(channelHandle);
   });
   Object.assign(subLink.style, {
     padding: '5px',
@@ -158,6 +153,10 @@ function buildSubLink(channelContainer) {
   return subLink;
 }
 
+function checkChannelSubscribed(channelHandle) {
+  console.log(`check channel subscribed: ${channelHandle}`);
+}
+
 function buildSpacer() {
   let spacer = document.createElement('span');
   spacer.innerText = '|';
@@ -165,26 +164,27 @@ function buildSpacer() {
   return spacer;
 }
 
-function buildDlLink(channelContainer) {
+function buildDlLink() {
   let dlLink = document.createElement('span');
-  dlLink.innerHTML = downloadIcon;
+  let currentLocation = window.location.href;
+  let urlObj = new URL(currentLocation);
 
+  if (urlObj.pathname.startsWith('/watch')) {
+    let videoId = urlObj.search.split('=')[1];
+    dlLink.setAttribute('data-type', 'video');
+    dlLink.setAttribute('data-id', videoId);
+    dlLink.title = `TA download video: ${videoId}`;
+  } else {
+    let toDownload = urlObj.pathname.slice(1);
+    dlLink.setAttribute('data-id', toDownload);
+    dlLink.setAttribute('data-type', 'channel');
+    dlLink.title = `TA download channel ${toDownload}`;
+  }
+  dlLink.innerHTML = downloadIcon;
   dlLink.addEventListener('click', e => {
     e.preventDefault();
-    let currentLocation = window.location.href;
-    console.log('download: ' + currentLocation);
+    console.log(`download: ${currentLocation}`);
     sendUrl(currentLocation, 'download', dlLink);
-  });
-  dlLink.addEventListener('mouseover', e => {
-    let subText;
-    let currentLocation = window.location.href;
-    if (window.location.pathname === '/watch') {
-      subText = currentLocation;
-    } else {
-      subText = channelContainer.querySelector('#text').textContent + ' ' + currentLocation;
-    }
-
-    e.target.title = 'TA Download: ' + subText;
   });
   Object.assign(dlLink.style, {
     filter: 'invert()',
@@ -196,16 +196,28 @@ function buildDlLink(channelContainer) {
   return dlLink;
 }
 
+function getChannelHandle(channelContainer) {
+  const channelHandleContainer = document.querySelector('#channel-handle');
+  let channelHandle = channelHandleContainer ? channelHandleContainer.innerText : null;
+  if (!channelHandle) {
+    let href = channelContainer.querySelector('.ytd-video-owner-renderer').href;
+    const urlObj = new URL(href);
+    channelHandle = urlObj.pathname.split('/')[1];
+  }
+  return channelHandle;
+}
+
 function buildChannelButton(channelContainer) {
+  let channelHandle = getChannelHandle(channelContainer);
   let buttonDiv = buildButtonDiv();
 
-  let subLink = buildSubLink(channelContainer);
+  let subLink = buildSubLink(channelHandle);
   buttonDiv.appendChild(subLink);
 
   let spacer = buildSpacer();
   buttonDiv.appendChild(spacer);
 
-  let dlLink = buildDlLink(channelContainer);
+  let dlLink = buildDlLink();
   buttonDiv.appendChild(dlLink);
 
   return buttonDiv;
@@ -430,6 +442,10 @@ function sendUrl(url, action, button) {
 function cleanButtons() {
   console.log('trigger clean buttons');
   document.querySelectorAll('.ta-button').forEach(button => {
+    button.parentElement.hasTA = false;
+    button.remove();
+  });
+  document.querySelectorAll('.ta-channel-button').forEach(button => {
     button.parentElement.hasTA = false;
     button.remove();
   });
