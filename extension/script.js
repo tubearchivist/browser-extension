@@ -159,8 +159,8 @@ function buildChannelButton(channelContainer) {
   let channelHandle = getChannelHandle(channelContainer);
   let buttonDiv = buildChannelButtonDiv();
 
-  let subLink = buildChannelSubLink(channelHandle);
-  buttonDiv.appendChild(subLink);
+  let channelSubButton = buildChannelSubButton(channelHandle);
+  buttonDiv.appendChild(channelSubButton);
 
   let spacer = buildSpacer();
   buttonDiv.appendChild(spacer);
@@ -199,27 +199,27 @@ function buildChannelButtonDiv() {
   return buttonDiv;
 }
 
-function buildChannelSubLink(channelHandle) {
-  let subLink = document.createElement('span');
-  subLink.innerText = 'Subscribe';
-  subLink.title = `TA Subscribe: ${channelHandle}`;
-  subLink.setAttribute('data-id', channelHandle);
-  subLink.setAttribute('data-type', 'channel');
+function buildChannelSubButton(channelHandle) {
+  let channelSubButton = document.createElement('span');
+  channelSubButton.innerText = 'Subscribe';
+  channelSubButton.title = `TA Subscribe: ${channelHandle}`;
+  channelSubButton.setAttribute('data-id', channelHandle);
+  channelSubButton.setAttribute('data-type', 'channel');
 
-  subLink.addEventListener('click', e => {
+  channelSubButton.addEventListener('click', e => {
     e.preventDefault();
     console.log(`subscribe to: ${channelHandle}`);
-    sendUrl(channelHandle, 'subscribe', subLink);
+    sendUrl(channelHandle, 'subscribe', channelSubButton);
   });
-  subLink.addEventListener('mouseover', () => {
+  channelSubButton.addEventListener('mouseover', () => {
     checkChannelSubscribed(channelHandle);
   });
-  Object.assign(subLink.style, {
+  Object.assign(channelSubButton.style, {
     padding: '5px',
     cursor: 'pointer',
   });
 
-  return subLink;
+  return channelSubButton;
 }
 
 function checkChannelSubscribed(channelHandle) {
