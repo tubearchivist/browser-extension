@@ -106,8 +106,20 @@ function getBrowser() {
 }
 
 function getChannelContainers() {
-  let nodes = document.querySelectorAll('#inner-header-container, #owner');
-  return nodes;
+  const elements = document.querySelectorAll('#inner-header-container, #owner');
+  const channelContainerNodes = [];
+
+  elements.forEach(element => {
+    if (isElementVisible(element)) {
+      channelContainerNodes.push(element);
+    }
+  });
+
+  return channelContainerNodes;
+}
+
+function isElementVisible(element) {
+  return element.offsetWidth > 0 || element.offsetHeight > 0 || element.getClientRects().length > 0;
 }
 
 function ensureTALinks() {
@@ -201,7 +213,7 @@ function buildChannelButtonDiv() {
 
 function buildChannelSubButton(channelHandle) {
   let channelSubButton = document.createElement('span');
-  channelSubButton.innerText = 'Subscribe';
+  channelSubButton.innerText = 'Checking...';
   channelSubButton.title = `TA Subscribe: ${channelHandle}`;
   channelSubButton.setAttribute('data-id', channelHandle);
   channelSubButton.setAttribute('data-type', 'channel');
@@ -211,19 +223,36 @@ function buildChannelSubButton(channelHandle) {
     console.log(`subscribe to: ${channelHandle}`);
     sendUrl(channelHandle, 'subscribe', channelSubButton);
   });
-  channelSubButton.addEventListener('mouseover', () => {
-    checkChannelSubscribed(channelHandle);
-  });
   Object.assign(channelSubButton.style, {
     padding: '5px',
     cursor: 'pointer',
   });
+  checkChannelSubscribed(channelSubButton);
 
   return channelSubButton;
 }
 
-function checkChannelSubscribed(channelHandle) {
-  console.log(`check channel subscribed: ${channelHandle}`);
+function checkChannelSubscribed(channelSubButton) {
+  function handleResponse(message) {
+    if (
+      message === false ||
+      (typeof message === 'object' && message.channel_subscribed === false)
+    ) {
+      channelSubButton.innerText = 'Subscribe';
+    } else if (typeof message === 'object' && message.channel_subscribed === true) {
+      channelSubButton.innerText = 'Unsubscribe';
+    } else {
+      console.log('Unknown state');
+    }
+  }
+  function handleError() {
+    console.log('error');
+  }
+
+  let channelHandle = channelSubButton.dataset.id;
+  let message = { type: 'getChannel', channelHandle };
+  let sending = sendMessage(message);
+  sending.then(handleResponse, handleError);
 }
 
 function buildSpacer() {

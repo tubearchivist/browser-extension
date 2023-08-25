@@ -138,8 +138,13 @@ async function subscribe(url) {
 async function videoExists(id) {
   const path = `api/video/${id}/`;
   let response = await sendGet(path);
-  console.log(response);
   return Boolean(response.data);
+}
+
+async function getChannel(channelHandle) {
+  const path = `api/channel/search/?q=${channelHandle}`;
+  let response = await sendGet(path);
+  return response.data;
 }
 
 async function cookieStr(cookieLines) {
@@ -225,6 +230,9 @@ function handleMessage(request, sender, sendResponse) {
       }
       case 'videoExists': {
         return await videoExists(request.videoId);
+      }
+      case 'getChannel': {
+        return await getChannel(request.channelHandle);
       }
       default: {
         let err = new Error(`unknown message type ${JSON.stringify(request.type)}`);
