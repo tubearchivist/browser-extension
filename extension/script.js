@@ -329,7 +329,7 @@ function buildVideoButton(titleContainer) {
 
   dlButton.setAttribute('data-id', videoId);
   dlButton.setAttribute('data-type', 'video');
-  dlButton.title = `TA download video ${videoId}`;
+  dlButton.title = `TA download video: ${titleContainer.innerText} [${videoId}]`;
 
   Object.assign(dlButton.style, {
     display: 'flex',
