@@ -4,32 +4,6 @@ content script running on youtube.com
 
 'use strict';
 
-let browserType = getBrowser();
-
-// boilerplate to dedect browser type api
-function getBrowser() {
-  if (typeof chrome !== 'undefined') {
-    if (typeof browser !== 'undefined') {
-      console.log('detected firefox');
-      return browser;
-    } else {
-      console.log('detected chrome');
-      return chrome;
-    }
-  } else {
-    console.log('failed to dedect browser');
-    throw 'browser detection error';
-  }
-}
-
-async function sendMessage(message) {
-  let { success, value } = await browserType.runtime.sendMessage(message);
-  if (!success) {
-    throw value;
-  }
-  return value;
-}
-
 const downloadIcon = `<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 viewBox="0 0 500 500" style="enable-background:new 0 0 500 500;" xml:space="preserve">
 <style type="text/css">
@@ -113,7 +87,102 @@ viewBox="0 0 500 500" style="enable-background:new 0 0 500 500;" xml:space="pres
 
 const defaultIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>minus-thick</title><path d="M20 14H4V10H20" /></svg>`;
 
-function buildButtonDiv() {
+let browserType = getBrowser();
+
+// boilerplate to dedect browser type api
+function getBrowser() {
+  if (typeof chrome !== 'undefined') {
+    if (typeof browser !== 'undefined') {
+      console.log('detected firefox');
+      return browser;
+    } else {
+      console.log('detected chrome');
+      return chrome;
+    }
+  } else {
+    console.log('failed to dedect browser');
+    throw 'browser detection error';
+  }
+}
+
+function getChannelContainers() {
+  let nodes = document.querySelectorAll('#inner-header-container, #owner');
+  return nodes;
+}
+
+function ensureTALinks() {
+  let channelContainerNodes = getChannelContainers();
+
+  for (let channelContainer of channelContainerNodes) {
+    channelContainer = adjustOwner(channelContainer);
+    if (channelContainer.hasTA) continue;
+    let channelButton = buildChannelButton(channelContainer);
+    channelContainer.appendChild(channelButton);
+    channelContainer.hasTA = true;
+  }
+
+  let titleContainerNodes = getTitleContainers();
+  for (let titleContainer of titleContainerNodes) {
+    if (titleContainer.hasTA) continue;
+    let videoButton = buildVideoButton(titleContainer);
+    if (videoButton == null) continue;
+    processTitle(titleContainer);
+    titleContainer.appendChild(videoButton);
+    titleContainer.hasTA = true;
+  }
+}
+
+// fix positioning of #owner div to fit new button
+function adjustOwner(channelContainer) {
+  let sponsorButton = channelContainer.querySelector('#sponsor-button');
+  if (sponsorButton === null) {
+    return channelContainer;
+  }
+
+  let variableMinWidth;
+  if (sponsorButton.hasChildNodes()) {
+    variableMinWidth = '140px';
+  } else {
+    variableMinWidth = '45px';
+  }
+
+  Object.assign(channelContainer.firstElementChild.style, {
+    minWidth: variableMinWidth,
+  });
+  Object.assign(channelContainer.style, {
+    minWidth: 'calc(40% + 50px)',
+  });
+  return channelContainer;
+}
+
+function buildChannelButton(channelContainer) {
+  let channelHandle = getChannelHandle(channelContainer);
+  let buttonDiv = buildChannelButtonDiv();
+
+  let subLink = buildChannelSubLink(channelHandle);
+  buttonDiv.appendChild(subLink);
+
+  let spacer = buildSpacer();
+  buttonDiv.appendChild(spacer);
+
+  let dlLink = buildChannelDownloadLink();
+  buttonDiv.appendChild(dlLink);
+
+  return buttonDiv;
+}
+
+function getChannelHandle(channelContainer) {
+  const channelHandleContainer = document.querySelector('#channel-handle');
+  let channelHandle = channelHandleContainer ? channelHandleContainer.innerText : null;
+  if (!channelHandle) {
+    let href = channelContainer.querySelector('.ytd-video-owner-renderer').href;
+    const urlObj = new URL(href);
+    channelHandle = urlObj.pathname.split('/')[1];
+  }
+  return channelHandle;
+}
+
+function buildChannelButtonDiv() {
   let buttonDiv = document.createElement('div');
   buttonDiv.classList.add('ta-channel-button');
 
@@ -130,7 +199,7 @@ function buildButtonDiv() {
   return buttonDiv;
 }
 
-function buildSubLink(channelHandle) {
+function buildChannelSubLink(channelHandle) {
   let subLink = document.createElement('span');
   subLink.innerText = 'Subscribe';
   subLink.title = `TA Subscribe: ${channelHandle}`;
@@ -164,7 +233,7 @@ function buildSpacer() {
   return spacer;
 }
 
-function buildDlLink() {
+function buildChannelDownloadLink() {
   let dlLink = document.createElement('span');
   let currentLocation = window.location.href;
   let urlObj = new URL(currentLocation);
@@ -196,86 +265,57 @@ function buildDlLink() {
   return dlLink;
 }
 
-function getChannelHandle(channelContainer) {
-  const channelHandleContainer = document.querySelector('#channel-handle');
-  let channelHandle = channelHandleContainer ? channelHandleContainer.innerText : null;
-  if (!channelHandle) {
-    let href = channelContainer.querySelector('.ytd-video-owner-renderer').href;
-    const urlObj = new URL(href);
-    channelHandle = urlObj.pathname.split('/')[1];
-  }
-  return channelHandle;
-}
-
-function buildChannelButton(channelContainer) {
-  let channelHandle = getChannelHandle(channelContainer);
-  let buttonDiv = buildButtonDiv();
-
-  let subLink = buildSubLink(channelHandle);
-  buttonDiv.appendChild(subLink);
-
-  let spacer = buildSpacer();
-  buttonDiv.appendChild(spacer);
-
-  let dlLink = buildDlLink();
-  buttonDiv.appendChild(dlLink);
-
-  return buttonDiv;
-}
-
-function getChannelContainers() {
-  let nodes = document.querySelectorAll('#inner-header-container, #owner');
-  return nodes;
-}
-
 function getTitleContainers() {
   let nodes = document.querySelectorAll('#video-title');
   return nodes;
 }
 
-// fix positioning of #owner div to fit new button
-function adjustOwner(channelContainer) {
-  let sponsorButton = channelContainer.querySelector('#sponsor-button');
-  if (sponsorButton === null) {
-    return channelContainer;
-  }
+function buildVideoButton(titleContainer) {
+  let href = getNearestLink(titleContainer);
+  const dlButton = document.createElement('a');
+  dlButton.classList.add('ta-button');
+  dlButton.href = '#';
 
-  let variableMinWidth;
-  if (sponsorButton.hasChildNodes()) {
-    variableMinWidth = '140px';
-  } else {
-    variableMinWidth = '45px';
-  }
+  let params = new URLSearchParams(href);
+  let videoId = params.get('/watch?v');
+  if (!videoId) return;
 
-  Object.assign(channelContainer.firstElementChild.style, {
-    minWidth: variableMinWidth,
+  dlButton.setAttribute('data-id', videoId);
+  dlButton.setAttribute('data-type', 'video');
+  dlButton.title = `TA download video: ${titleContainer.innerText} [${videoId}]`;
+
+  Object.assign(dlButton.style, {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#00202f',
+    color: '#fff',
+    fontSize: '1.4rem',
+    textDecoration: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    height: 'fit-content',
+    opacity: 0,
   });
-  Object.assign(channelContainer.style, {
-    minWidth: 'calc(40% + 50px)',
+
+  let dlIcon = document.createElement('span');
+  dlIcon.innerHTML = defaultIcon;
+  Object.assign(dlIcon.style, {
+    filter: 'invert()',
+    width: '18px',
+    height: '18px',
+    padding: '7px 8px',
   });
-  return channelContainer;
-}
 
-function ensureTALinks() {
-  let channelContainerNodes = getChannelContainers();
+  dlButton.appendChild(dlIcon);
 
-  for (let channelContainer of channelContainerNodes) {
-    channelContainer = adjustOwner(channelContainer);
-    if (channelContainer.hasTA) continue;
-    let channelButton = buildChannelButton(channelContainer);
-    channelContainer.appendChild(channelButton);
-    channelContainer.hasTA = true;
-  }
+  dlButton.addEventListener('click', e => {
+    e.preventDefault();
+    sendDownload(dlButton);
+    e.stopPropagation();
+  });
 
-  let titleContainerNodes = getTitleContainers();
-  for (let titleContainer of titleContainerNodes) {
-    if (titleContainer.hasTA) continue;
-    let videoButton = buildVideoButton(titleContainer);
-    if (videoButton == null) continue;
-    processTitle(titleContainer);
-    titleContainer.appendChild(videoButton);
-    titleContainer.hasTA = true;
-  }
+  return dlButton;
 }
 
 function getNearestLink(element) {
@@ -327,54 +367,6 @@ function checkVideoExists(taButton) {
   let message = { type: 'videoExists', videoId };
   let sending = sendMessage(message);
   sending.then(handleResponse, handleError);
-}
-
-function buildVideoButton(titleContainer) {
-  let href = getNearestLink(titleContainer);
-  const dlButton = document.createElement('a');
-  dlButton.classList.add('ta-button');
-  dlButton.href = '#';
-
-  let params = new URLSearchParams(href);
-  let videoId = params.get('/watch?v');
-  if (!videoId) return;
-
-  dlButton.setAttribute('data-id', videoId);
-  dlButton.setAttribute('data-type', 'video');
-  dlButton.title = `TA download video: ${titleContainer.innerText} [${videoId}]`;
-
-  Object.assign(dlButton.style, {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#00202f',
-    color: '#fff',
-    fontSize: '1.4rem',
-    textDecoration: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    height: 'fit-content',
-    opacity: 0,
-  });
-
-  let dlIcon = document.createElement('span');
-  dlIcon.innerHTML = defaultIcon;
-  Object.assign(dlIcon.style, {
-    filter: 'invert()',
-    width: '18px',
-    height: '18px',
-    padding: '7px 8px',
-  });
-
-  dlButton.appendChild(dlIcon);
-
-  dlButton.addEventListener('click', e => {
-    e.preventDefault();
-    sendDownload(dlButton);
-    e.stopPropagation();
-  });
-
-  return dlButton;
 }
 
 function sendDownload(button) {
@@ -437,6 +429,14 @@ function sendUrl(url, action, button) {
 
   let sending = sendMessage(message);
   sending.then(handleResponse, handleError);
+}
+
+async function sendMessage(message) {
+  let { success, value } = await browserType.runtime.sendMessage(message);
+  if (!success) {
+    throw value;
+  }
+  return value;
 }
 
 function cleanButtons() {
