@@ -250,6 +250,8 @@ function checkChannelSubscribed(channelSubButton) {
     }
   }
   function handleError() {
+    buttonError(channelSubButton);
+    channelSubButton.innerText = 'Error';
     console.log('error');
   }
 
@@ -393,6 +395,7 @@ function checkVideoExists(taButton) {
     taButton.isChecked = true;
   }
   function handleError() {
+    buttonError(taButton);
     console.log('error');
   }
 
