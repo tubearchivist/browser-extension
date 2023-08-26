@@ -365,6 +365,7 @@ function getNearestLink(element) {
 }
 
 function processTitle(titleContainer) {
+  if (titleContainer.hasListener) return
   Object.assign(titleContainer.style, {
     display: 'flex',
     gap: '15px',
@@ -383,6 +384,7 @@ function processTitle(titleContainer) {
     if (!taButton) return;
     taButton.style.opacity = 0;
   });
+  titleContainer.hasListener = true;
 }
 
 function checkVideoExists(taButton) {
