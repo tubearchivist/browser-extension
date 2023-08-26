@@ -120,14 +120,14 @@ async function download(url) {
   );
 }
 
-async function subscribe(url) {
+async function subscribe(url, subscribed) {
   return await sendData(
     'api/channel/',
     {
       data: [
         {
           channel_id: url,
-          channel_subscribed: true,
+          channel_subscribed: subscribed,
         },
       ],
     },
@@ -141,9 +141,43 @@ async function videoExists(id) {
   return Boolean(response.data);
 }
 
-async function getChannel(channelHandle) {
+async function getChannelCache() {
+  let cache = await browserType.storage.local.get('cache');
+  return cache || { cache: {} };
+}
+
+async function setChannel(channelHandler, channelId) {
+  let cache = await getChannelCache();
+  cache.cache[channelHandler] = { id: channelId, timestamp: Date.now() };
+  browserType.storage.local.set(cache);
+}
+
+async function getChannelId(channelHandle) {
+  let cache = await getChannelCache();
+
+  if (cache.cache[channelHandle]) {
+    return cache.cache[channelHandle]?.id;
+  }
+
+  let channel = await searchChannel(channelHandle);
+  if (channel) setChannel(channelHandle, channel.channel_id);
+
+  return channel.channel_id;
+}
+
+async function searchChannel(channelHandle) {
   const path = `api/channel/search/?q=${channelHandle}`;
   let response = await sendGet(path);
+  return response.data;
+}
+
+async function getChannel(channelHandle) {
+  let channelId = await getChannelId(channelHandle);
+  if (!channelId) return;
+
+  const path = `api/channel/${channelId}/`;
+  let response = await sendGet(path);
+
   return response.data;
 }
 
@@ -204,6 +238,9 @@ type Message =
   | { type: 'sendCookie' }
   | { type: 'download', url: string }
   | { type: 'subscribe', url: string }
+  | { type: 'unsubscribe', url: string }
+  | { type: 'videoExists', id: string }
+  | { type: 'getChannel', url: string }
 */
 function handleMessage(request, sender, sendResponse) {
   console.log('message background.js listener got message', request);
@@ -226,7 +263,11 @@ function handleMessage(request, sender, sendResponse) {
         return await download(request.url);
       }
       case 'subscribe': {
-        return await subscribe(request.url);
+        return await subscribe(request.url, true);
+      }
+      case 'unsubscribe': {
+        let channelId = await getChannelId(request.url);
+        return await subscribe(channelId, false);
       }
       case 'videoExists': {
         return await videoExists(request.videoId);

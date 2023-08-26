@@ -220,8 +220,15 @@ function buildChannelSubButton(channelHandle) {
 
   channelSubButton.addEventListener('click', e => {
     e.preventDefault();
-    console.log(`subscribe to: ${channelHandle}`);
-    sendUrl(channelHandle, 'subscribe', channelSubButton);
+    if (channelSubButton.innerText === 'Subscribe') {
+      console.log(`subscribe to: ${channelHandle}`);
+      sendUrl(channelHandle, 'subscribe', channelSubButton);
+    } else if (channelSubButton.innerText === 'Unsubscribe') {
+      console.log(`unsubscribe from: ${channelHandle}`);
+      sendUrl(channelHandle, 'unsubscribe', channelSubButton);
+    } else {
+      console.log('Unknown state');
+    }
   });
   Object.assign(channelSubButton.style, {
     padding: '5px',
@@ -234,10 +241,7 @@ function buildChannelSubButton(channelHandle) {
 
 function checkChannelSubscribed(channelSubButton) {
   function handleResponse(message) {
-    if (
-      message === false ||
-      (typeof message === 'object' && message.channel_subscribed === false)
-    ) {
+    if (!message || (typeof message === 'object' && message.channel_subscribed === false)) {
       channelSubButton.innerText = 'Subscribe';
     } else if (typeof message === 'object' && message.channel_subscribed === true) {
       channelSubButton.innerText = 'Unsubscribe';
