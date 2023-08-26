@@ -143,7 +143,8 @@ async function videoExists(id) {
 
 async function getChannelCache() {
   let cache = await browserType.storage.local.get('cache');
-  return cache || { cache: {} };
+  if (cache.cache) return cache;
+  return { cache: {} };
 }
 
 async function setChannel(channelHandler, channelId) {
