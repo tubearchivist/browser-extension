@@ -433,7 +433,7 @@ function buttonSuccess(button) {
   if (buttonSpan.innerHTML === 'Subscribe') {
     buttonSpan.innerHTML = 'Success';
     setTimeout(() => {
-      buttonSpan.innerHTML = 'Subscribe';
+      buttonSpan.innerHTML = 'Unsubscribe';
     }, 2000);
   } else {
     buttonSpan.innerHTML = checkmarkIcon;
