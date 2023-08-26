@@ -138,7 +138,9 @@ async function subscribe(url, subscribed) {
 async function videoExists(id) {
   const path = `api/video/${id}/`;
   let response = await sendGet(path);
-  return Boolean(response.data);
+  if (!response.data) return false;
+  let access = await getAccess();
+  return new URL(`video/${id}/`, access.url).href;
 }
 
 async function getChannelCache() {

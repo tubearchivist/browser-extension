@@ -278,6 +278,7 @@ function buildChannelDownloadButton() {
     channelDownloadButton.setAttribute('data-type', 'video');
     channelDownloadButton.setAttribute('data-id', videoId);
     channelDownloadButton.title = `TA download video: ${videoId}`;
+    checkVideoExists(channelDownloadButton);
   } else {
     let toDownload = urlObj.pathname.slice(1);
     channelDownloadButton.setAttribute('data-id', toDownload);
@@ -386,9 +387,14 @@ function processTitle(titleContainer) {
 
 function checkVideoExists(taButton) {
   function handleResponse(message) {
-    let buttonSpan = taButton.querySelector('span');
-    if (message) {
+    let buttonSpan = taButton.querySelector('span') || taButton;
+    if (message !== false) {
       buttonSpan.innerHTML = checkmarkIcon;
+      buttonSpan.title = 'Open in TA';
+      buttonSpan.addEventListener('click', () => {
+        let win = window.open(message, '_blank');
+        win.focus();
+      });
     } else {
       buttonSpan.innerHTML = downloadIcon;
     }
