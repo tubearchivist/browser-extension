@@ -280,10 +280,9 @@ function buildChannelDownloadButton() {
     channelDownloadButton.title = `TA download video: ${videoId}`;
     checkVideoExists(channelDownloadButton);
   } else {
-    let toDownload = urlObj.pathname.slice(1);
-    channelDownloadButton.setAttribute('data-id', toDownload);
+    channelDownloadButton.setAttribute('data-id', currentLocation);
     channelDownloadButton.setAttribute('data-type', 'channel');
-    channelDownloadButton.title = `TA download channel ${toDownload}`;
+    channelDownloadButton.title = `TA download channel ${currentLocation}`;
   }
   channelDownloadButton.innerHTML = downloadIcon;
   channelDownloadButton.addEventListener('click', e => {
