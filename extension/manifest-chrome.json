@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "TubeArchivist Companion",
     "description": "Interact with your selfhosted TA server.",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "icons": {
         "48": "/images/icon.png",
         "128": "/images/icon128.png"
