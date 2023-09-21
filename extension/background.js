@@ -140,7 +140,7 @@ async function videoExists(id) {
   let response = await sendGet(path);
   if (!response.data) return false;
   let access = await getAccess();
-  return new URL(`video/${id}/`, access.url).href;
+  return new URL(`video/${id}/`, `${access.url}:${access.port}/`).href;
 }
 
 async function getChannelCache() {
