@@ -15,7 +15,7 @@ This is a browser extension to bridge YouTube with [Tube Archivist](https://gith
 - Sync your cookies for yt-dlp.
 
 ## Screenshots
-![popup screenshot](assets/screenshot.png?raw=true "Tube Archivist Companion Popup")
+![popup screenshot](assets/tac-screenshot.png?raw=true "Tube Archivist Companion Popup")
 Popup to enter your connection details.
 <br><br>
 
@@ -23,11 +23,11 @@ Popup to enter your connection details.
 Button injected on video page to download the video or subscribe to the channel.
 <br><br>
 
-![search page](assets/screenshot-search.png?raw=true "Tube Archivist Companion Search Page")
+![search page](assets/tac-screenshot-search.png?raw=true "Tube Archivist Companion Search Page")
 Download button injected showing when hovering over top left corned of thumbnail
 <br><br>
 
-![channel page](assets/screenshot-channel.png?raw=true "Tube Archivist Companion Channel Page")
+![channel page](assets/tac-screenshot-channel.png?raw=true "Tube Archivist Companion Channel Page")
 Channel button injected to subscribe or download whole channel, video download button showing when hovering over topleft corner of thumbnail.
 <br>
 
