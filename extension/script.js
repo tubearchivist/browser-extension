@@ -274,7 +274,8 @@ function buildChannelDownloadButton() {
   let urlObj = new URL(currentLocation);
 
   if (urlObj.pathname.startsWith('/watch')) {
-    let videoId = urlObj.search.split('=')[1];
+    let params = new URLSearchParams(document.location.search);
+    let videoId = params.get('v');
     channelDownloadButton.setAttribute('data-type', 'video');
     channelDownloadButton.setAttribute('data-id', videoId);
     channelDownloadButton.title = `TA download video: ${videoId}`;
