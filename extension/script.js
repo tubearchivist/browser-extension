@@ -338,8 +338,8 @@ function buildVideoButton(titleContainer) {
   dlIcon.innerHTML = defaultIcon;
   Object.assign(dlIcon.style, {
     filter: 'invert()',
-    width: '18px',
-    height: '18px',
+    width: '15px',
+    height: '15px',
     padding: '7px 8px',
   });
 
