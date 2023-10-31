@@ -312,8 +312,13 @@ function buildVideoButton(titleContainer) {
   dlButton.classList.add('ta-button');
   dlButton.href = '#';
 
-  let params = new URLSearchParams(href);
-  let videoId = params.get('/watch?v');
+  let videoId;
+  if (href.startsWith('/watch?v')) {
+    let params = new URLSearchParams(href);
+    videoId = params.get('/watch?v');
+  } else if (href.startsWith('/shorts/')) {
+    videoId = href.split('/')[2];
+  }
   if (!videoId) return;
 
   dlButton.setAttribute('data-id', videoId);
@@ -365,7 +370,7 @@ function getNearestLink(element) {
 }
 
 function processTitle(titleContainer) {
-  if (titleContainer.hasListener) return
+  if (titleContainer.hasListener) return;
   Object.assign(titleContainer.style, {
     display: 'flex',
     gap: '15px',
