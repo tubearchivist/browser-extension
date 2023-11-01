@@ -146,8 +146,7 @@ function ensureTALinks() {
 
 // fix positioning of #owner div to fit new button
 function adjustOwner(channelContainer) {
-  channelContainer = channelContainer.querySelector("#buttons");
-  return channelContainer;
+  return  channelContainer.querySelector("#buttons") || channelContainer;
 }
 
 function buildChannelButton(channelContainer) {
