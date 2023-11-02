@@ -391,7 +391,8 @@ function checkVideoExists(taButton) {
   }
   function handleError() {
     buttonError(taButton);
-    console.log('error');
+    let videoId = taButton.dataset.id;
+    console.log(`error: failed to get info from TA for video ${videoId}`);
   }
 
   let videoId = taButton.dataset.id;
