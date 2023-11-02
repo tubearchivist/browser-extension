@@ -146,25 +146,7 @@ function ensureTALinks() {
 
 // fix positioning of #owner div to fit new button
 function adjustOwner(channelContainer) {
-  let sponsorButton = channelContainer.querySelector('#sponsor-button');
-  if (sponsorButton === null) {
-    return channelContainer;
-  }
-
-  let variableMinWidth;
-  if (sponsorButton.hasChildNodes()) {
-    variableMinWidth = '140px';
-  } else {
-    variableMinWidth = '45px';
-  }
-
-  Object.assign(channelContainer.firstElementChild.style, {
-    minWidth: variableMinWidth,
-  });
-  Object.assign(channelContainer.style, {
-    minWidth: 'calc(40% + 50px)',
-  });
-  return channelContainer;
+  return  channelContainer.querySelector("#buttons") || channelContainer;
 }
 
 function buildChannelButton(channelContainer) {
@@ -197,16 +179,15 @@ function getChannelHandle(channelContainer) {
 function buildChannelButtonDiv() {
   let buttonDiv = document.createElement('div');
   buttonDiv.classList.add('ta-channel-button');
-
   Object.assign(buttonDiv.style, {
-    display: 'flex',
-    alignItems: 'center',
-    backgroundColor: '#00202f',
-    color: '#fff',
-    fontSize: '14px',
-    padding: '5px',
-    margin: '5px',
-    borderRadius: '8px',
+    'display': 'flex',
+    'alignItems': 'center',
+    'backgroundColor': '#00202f',
+    'color': '#fff',
+    'fontSize': '14px',
+    'padding': '5px',
+    'margin-left': '8px',
+    'borderRadius': '18px',
   });
   return buttonDiv;
 }
