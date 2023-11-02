@@ -146,7 +146,7 @@ function ensureTALinks() {
 
 // fix positioning of #owner div to fit new button
 function adjustOwner(channelContainer) {
-  return  channelContainer.querySelector("#buttons") || channelContainer;
+  return channelContainer.querySelector('#buttons') || channelContainer;
 }
 
 function buildChannelButton(channelContainer) {
@@ -180,14 +180,14 @@ function buildChannelButtonDiv() {
   let buttonDiv = document.createElement('div');
   buttonDiv.classList.add('ta-channel-button');
   Object.assign(buttonDiv.style, {
-    'display': 'flex',
-    'alignItems': 'center',
-    'backgroundColor': '#00202f',
-    'color': '#fff',
-    'fontSize': '14px',
-    'padding': '5px',
+    display: 'flex',
+    alignItems: 'center',
+    backgroundColor: '#00202f',
+    color: '#fff',
+    fontSize: '14px',
+    padding: '5px',
     'margin-left': '8px',
-    'borderRadius': '18px',
+    borderRadius: '18px',
   });
   return buttonDiv;
 }
@@ -289,6 +289,7 @@ function getTitleContainers() {
 
 function buildVideoButton(titleContainer) {
   let href = getNearestLink(titleContainer);
+  if (!href) return;
   const dlButton = document.createElement('a');
   dlButton.classList.add('ta-button');
   dlButton.href = '#';
