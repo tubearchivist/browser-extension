@@ -124,13 +124,13 @@ function isElementVisible(element) {
 
 function ensureTALinks() {
   let channelContainerNodes = getChannelContainers();
-
   for (let channelContainer of channelContainerNodes) {
     channelContainer = adjustOwner(channelContainer);
     if (channelContainer.hasTA) continue;
-    let channelButton = buildChannelButton(channelContainer);
-    channelContainer.appendChild(channelButton);
     channelContainer.hasTA = true;
+    buildChannelButton(channelContainer).then(channelButton => {
+      channelContainer.appendChild(channelButton);
+    });
   }
 
   let titleContainerNodes = getTitleContainers();
@@ -150,19 +150,25 @@ function adjustOwner(channelContainer) {
 }
 
 function buildChannelButton(channelContainer) {
-  let channelHandle = getChannelHandle(channelContainer);
-  let buttonDiv = buildChannelButtonDiv();
+  return new Promise(resolve => {
+    let buttonDiv;
+    let channelSubButton;
+    let spacer;
+    let channelDownloadButton;
 
-  let channelSubButton = buildChannelSubButton(channelHandle);
-  buttonDiv.appendChild(channelSubButton);
-
-  let spacer = buildSpacer();
-  buttonDiv.appendChild(spacer);
-
-  let channelDownloadButton = buildChannelDownloadButton();
-  buttonDiv.appendChild(channelDownloadButton);
-
-  return buttonDiv;
+    // Delayed execution for interface to refresh
+    setTimeout(() => {
+      const channelHandle = getChannelHandle(channelContainer);
+      buttonDiv = buildChannelButtonDiv();
+      channelSubButton = buildChannelSubButton(channelHandle);
+      spacer = buildSpacer();
+      channelDownloadButton = buildChannelDownloadButton();
+      buttonDiv.appendChild(channelSubButton);
+      buttonDiv.appendChild(spacer);
+      buttonDiv.appendChild(channelDownloadButton);
+      resolve(buttonDiv);
+    }, 2000);
+  });
 }
 
 function getChannelHandle(channelContainer) {
