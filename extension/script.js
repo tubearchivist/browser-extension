@@ -126,8 +126,8 @@ function ensureTALinks() {
   let channelContainerNodes = getChannelContainers();
 
   for (let channelContainer of channelContainerNodes) {
-    if (channelContainer.hasTA) continue;
     channelContainer = adjustOwner(channelContainer);
+    if (channelContainer.hasTA) continue;
     let channelButton = buildChannelButton(channelContainer);
     channelContainer.appendChild(channelButton);
     channelContainer.hasTA = true;
@@ -145,7 +145,6 @@ function ensureTALinks() {
 }
 ensureTALinks = throttled(ensureTALinks, 700);
 
-// fix positioning of #owner div to fit new button
 function adjustOwner(channelContainer) {
   return channelContainer.querySelector('#buttons') || channelContainer;
 }
