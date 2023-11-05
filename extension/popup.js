@@ -93,15 +93,6 @@ apiKeyInput.addEventListener('change', () => {
   });
 });
 
-browserType.storage.local.get(['popupFullUrl', 'popupApiKey']).then(results => {
-  if (results.popupFullUrl != null && fullUrlInput.value === '') {
-    fullUrlInput.value = results.popupFullUrl;
-  }
-  if (results.popupApiKey != null && apiKeyInput.value === '') {
-    apiKeyInput.value = results.popupApiKey;
-  }
-});
-
 function sendCookie() {
   console.log('popup send cookie');
   clearError();
@@ -203,11 +194,18 @@ function setStatusIcon(connected) {
   }
 }
 
+
 // fill in form
 document.addEventListener('DOMContentLoaded', async () => {
   function onGot(item) {
     if (!item.access) {
       console.log('no access details found');
+      if (item.popupFullUrl != null && fullUrlInput.value === '') {
+        fullUrlInput.value = item.popupFullUrl;
+      }
+      if (item.popupApiKey != null && apiKeyInput.value === '') {
+        apiKeyInput.value = item.popupApiKey;
+      }
       setStatusIcon(false);
       return;
     }
@@ -241,7 +239,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('autostart').checked = true;
   }
 
-  browserType.storage.local.get('access', function (result) {
+  browserType.storage.local.get(['access', 'popupFullUrl', 'popupApiKey'], function (result) {
     onGot(result);
   });
 
