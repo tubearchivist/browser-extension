@@ -78,6 +78,30 @@ document.getElementById('autostart').addEventListener('click', function () {
   toggleAutostart();
 });
 
+
+let fullUrlInput = document.getElementById('full-url');
+fullUrlInput.addEventListener('change', () => {
+  browserType.storage.local.set({
+    popupFullUrl: fullUrlInput.value,
+  });
+});
+
+let apiKeyInput = document.getElementById('api-key');
+apiKeyInput.addEventListener('change', () => {
+  browserType.storage.local.set({
+    popupApiKey: apiKeyInput.value,
+  });
+});
+
+browserType.storage.local.get(['popupFullUrl', 'popupApiKey']).then(results => {
+  if (results.popupFullUrl != null && fullUrlInput.value === '') {
+    fullUrlInput.value = results.popupFullUrl;
+  }
+  if (results.popupApiKey != null && apiKeyInput.value === '') {
+    apiKeyInput.value = results.popupApiKey;
+  }
+});
+
 function sendCookie() {
   console.log('popup send cookie');
   clearError();
