@@ -192,13 +192,20 @@ function buildChannelButton(channelContainer) {
 }
 
 function getChannelHandle(channelContainer) {
-  const channelHandleContainer = document.querySelector('#channel-handle');
-  let channelHandle = channelHandleContainer ? channelHandleContainer.innerText : null;
-  if (!channelHandle) {
-    let href = channelContainer.querySelector('.ytd-video-owner-renderer').href;
-    const urlObj = new URL(href);
-    channelHandle = urlObj.pathname.split('/')[1];
+  let channelHandle;
+  const videoOwnerRenderer = channelContainer.querySelector('.ytd-video-owner-renderer');
+
+  if (!videoOwnerRenderer) {
+    const channelHandleContainer = document.querySelector('#channel-handle');
+    channelHandle = channelHandleContainer ? channelHandleContainer.innerText : null;
+  } else {
+    const href = videoOwnerRenderer.href;
+    if (href) {
+      const urlObj = new URL(href);
+      channelHandle = urlObj.pathname.split('/')[1];
+    }
   }
+
   return channelHandle;
 }
 
@@ -309,8 +316,14 @@ function buildChannelDownloadButton() {
 }
 
 function getTitleContainers() {
-  let nodes = document.querySelectorAll('#video-title');
-  return nodes;
+  let elements = document.querySelectorAll('#video-title');
+  let videoNodes = [];
+  elements.forEach(element => {
+    if (isElementVisible(element)) {
+      videoNodes.push(element);
+    }
+  });
+  return elements;
 }
 
 function buildVideoButton(titleContainer) {
