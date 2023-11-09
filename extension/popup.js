@@ -38,6 +38,11 @@ function clearError() {
   errorOut.style.display = 'none';
 }
 
+function clearTempLocalStorage() {
+  browserType.storage.local.remove('popupApiKey');
+  browserType.storage.local.remove('popupFullUrl');
+}
+
 // store access details
 document.getElementById('save-login').addEventListener('click', function () {
   let url = document.getElementById('full-url').value;
@@ -139,6 +144,7 @@ function toggleAutostart() {
 // send ping message to TA backend
 function pingBackend() {
   clearError();
+  clearTempLocalStorage();
   function handleResponse() {
     console.log('connection validated');
     setStatusIcon(true);
