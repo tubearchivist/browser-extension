@@ -18,5 +18,7 @@ module.exports = {
     eqeqeq: ['error', 'always', { null: 'ignore' }],
     curly: ['error', 'multi-line'],
     'no-var': 'error',
+    'no-func-assign': 'off',
+    'no-inner-declarations': 'off',
   },
 };

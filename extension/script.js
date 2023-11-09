@@ -124,13 +124,13 @@ function isElementVisible(element) {
 
 function ensureTALinks() {
   let channelContainerNodes = getChannelContainers();
+
   for (let channelContainer of channelContainerNodes) {
     channelContainer = adjustOwner(channelContainer);
     if (channelContainer.hasTA) continue;
+    let channelButton = buildChannelButton(channelContainer);
+    channelContainer.appendChild(channelButton);
     channelContainer.hasTA = true;
-    buildChannelButton(channelContainer).then(channelButton => {
-      channelContainer.appendChild(channelButton);
-    });
   }
 
   let titleContainerNodes = getTitleContainers();
@@ -143,42 +143,69 @@ function ensureTALinks() {
     titleContainer.hasTA = true;
   }
 }
+ensureTALinks = throttled(ensureTALinks, 700);
 
-// fix positioning of #owner div to fit new button
 function adjustOwner(channelContainer) {
   return channelContainer.querySelector('#buttons') || channelContainer;
 }
 
 function buildChannelButton(channelContainer) {
-  return new Promise(resolve => {
-    let buttonDiv;
-    let channelSubButton;
-    let spacer;
-    let channelDownloadButton;
+  let channelHandle = getChannelHandle(channelContainer);
+  channelContainer.taDerivedHandle = channelHandle;
 
-    // Delayed execution for interface to refresh
-    setTimeout(() => {
-      const channelHandle = getChannelHandle(channelContainer);
-      buttonDiv = buildChannelButtonDiv();
-      channelSubButton = buildChannelSubButton(channelHandle);
-      spacer = buildSpacer();
-      channelDownloadButton = buildChannelDownloadButton();
-      buttonDiv.appendChild(channelSubButton);
-      buttonDiv.appendChild(spacer);
-      buttonDiv.appendChild(channelDownloadButton);
-      resolve(buttonDiv);
-    }, 2000);
-  });
+  let buttonDiv = buildChannelButtonDiv();
+
+  let channelSubButton = buildChannelSubButton(channelHandle);
+  buttonDiv.appendChild(channelSubButton);
+  channelContainer.taSubButton = channelSubButton;
+
+  let spacer = buildSpacer();
+  buttonDiv.appendChild(spacer);
+
+  let channelDownloadButton = buildChannelDownloadButton();
+  buttonDiv.appendChild(channelDownloadButton);
+  channelContainer.taDownloadButton = channelDownloadButton;
+
+  if (!channelContainer.taObserver) {
+    function updateButtonsIfNecessary() {
+      let newHandle = getChannelHandle(channelContainer);
+      if (channelContainer.taDerivedHandle === newHandle) return;
+      console.log(`updating handle from ${channelContainer.taDerivedHandle} to ${newHandle}`);
+      channelContainer.taDerivedHandle = newHandle;
+      let channelSubButton = buildChannelSubButton(newHandle);
+      channelContainer.taSubButton.replaceWith(channelSubButton);
+      channelContainer.taSubButton = channelSubButton;
+
+      let channelDownloadButton = buildChannelDownloadButton();
+      channelContainer.taDownloadButton.replaceWith(channelDownloadButton);
+      channelContainer.taDownloadButton = channelDownloadButton;
+    }
+    channelContainer.taObserver = new MutationObserver(throttled(updateButtonsIfNecessary, 100));
+    channelContainer.taObserver.observe(channelContainer, {
+      attributes: true,
+      childList: true,
+      subtree: true,
+    });
+  }
+
+  return buttonDiv;
 }
 
 function getChannelHandle(channelContainer) {
-  const channelHandleContainer = document.querySelector('#channel-handle');
-  let channelHandle = channelHandleContainer ? channelHandleContainer.innerText : null;
-  if (!channelHandle) {
-    let href = channelContainer.querySelector('.ytd-video-owner-renderer').href;
-    const urlObj = new URL(href);
-    channelHandle = urlObj.pathname.split('/')[1];
+  let channelHandle;
+  const videoOwnerRenderer = channelContainer.querySelector('.ytd-video-owner-renderer');
+
+  if (!videoOwnerRenderer) {
+    const channelHandleContainer = document.querySelector('#channel-handle');
+    channelHandle = channelHandleContainer ? channelHandleContainer.innerText : null;
+  } else {
+    const href = videoOwnerRenderer.href;
+    if (href) {
+      const urlObj = new URL(href);
+      channelHandle = urlObj.pathname.split('/')[1];
+    }
   }
+
   return channelHandle;
 }
 
@@ -236,10 +263,10 @@ function checkChannelSubscribed(channelSubButton) {
       console.log('Unknown state');
     }
   }
-  function handleError() {
+  function handleError(e) {
     buttonError(channelSubButton);
     channelSubButton.innerText = 'Error';
-    console.log('error');
+    console.error('error', e);
   }
 
   let channelHandle = channelSubButton.dataset.id;
@@ -289,16 +316,19 @@ function buildChannelDownloadButton() {
 }
 
 function getTitleContainers() {
-  let nodes = document.querySelectorAll('#video-title');
-  return nodes;
+  let elements = document.querySelectorAll('#video-title');
+  let videoNodes = [];
+  elements.forEach(element => {
+    if (isElementVisible(element)) {
+      videoNodes.push(element);
+    }
+  });
+  return elements;
 }
 
-function buildVideoButton(titleContainer) {
+function getVideoId(titleContainer) {
   let href = getNearestLink(titleContainer);
   if (!href) return;
-  const dlButton = document.createElement('a');
-  dlButton.classList.add('ta-button');
-  dlButton.href = '#';
 
   let videoId;
   if (href.startsWith('/watch?v')) {
@@ -307,11 +337,16 @@ function buildVideoButton(titleContainer) {
   } else if (href.startsWith('/shorts/')) {
     videoId = href.split('/')[2];
   }
+  return videoId;
+}
+
+function buildVideoButton(titleContainer) {
+  let videoId = getVideoId(titleContainer);
   if (!videoId) return;
 
-  dlButton.setAttribute('data-id', videoId);
-  dlButton.setAttribute('data-type', 'video');
-  dlButton.title = `TA download video: ${titleContainer.innerText} [${videoId}]`;
+  const dlButton = document.createElement('a');
+  dlButton.classList.add('ta-button');
+  dlButton.href = '#';
 
   Object.assign(dlButton.style, {
     display: 'flex',
@@ -395,13 +430,19 @@ function checkVideoExists(taButton) {
     }
     taButton.isChecked = true;
   }
-  function handleError() {
+  function handleError(e) {
     buttonError(taButton);
     let videoId = taButton.dataset.id;
     console.log(`error: failed to get info from TA for video ${videoId}`);
+    console.error(e);
   }
 
-  let videoId = taButton.dataset.id;
+  if (!taButton.parentElement) return;
+  let videoId = getVideoId(taButton.parentElement);
+  taButton.setAttribute('data-id', videoId);
+  taButton.setAttribute('data-type', 'video');
+  taButton.title = `TA download video: ${taButton.parentElement.innerText} [${videoId}]`;
+
   let message = { type: 'videoExists', videoId };
   let sending = sendMessage(message);
   sending.then(handleResponse, handleError);
@@ -455,9 +496,8 @@ function sendUrl(url, action, button) {
     }
   }
 
-  function handleError(error) {
-    console.log('error');
-    console.log(JSON.stringify(error));
+  function handleError(e) {
+    console.log('error', e);
     buttonError(button);
   }
 
@@ -490,15 +530,20 @@ function cleanButtons() {
 }
 
 let oldHref = document.location.href;
-let throttleBlock;
-const throttle = (callback, time) => {
-  if (throttleBlock) return;
-  throttleBlock = true;
-  setTimeout(() => {
-    callback();
-    throttleBlock = false;
-  }, time);
-};
+
+function throttled(callback, time) {
+  let throttleBlock = false;
+  let lastArgs;
+  return (...args) => {
+    lastArgs = args;
+    if (throttleBlock) return;
+    throttleBlock = true;
+    setTimeout(() => {
+      throttleBlock = false;
+      callback(...lastArgs);
+    }, time);
+  };
+}
 
 let observer = new MutationObserver(list => {
   const currentHref = document.location.href;
@@ -507,7 +552,7 @@ let observer = new MutationObserver(list => {
     oldHref = currentHref;
   }
   if (list.some(i => i.type === 'childList' && i.addedNodes.length > 0)) {
-    throttle(ensureTALinks, 700);
+    ensureTALinks();
   }
 });
 
