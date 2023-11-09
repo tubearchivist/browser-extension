@@ -326,12 +326,9 @@ function getTitleContainers() {
   return elements;
 }
 
-function buildVideoButton(titleContainer) {
+function getVideoId(titleContainer) {
   let href = getNearestLink(titleContainer);
   if (!href) return;
-  const dlButton = document.createElement('a');
-  dlButton.classList.add('ta-button');
-  dlButton.href = '#';
 
   let videoId;
   if (href.startsWith('/watch?v')) {
@@ -340,11 +337,16 @@ function buildVideoButton(titleContainer) {
   } else if (href.startsWith('/shorts/')) {
     videoId = href.split('/')[2];
   }
+  return videoId;
+}
+
+function buildVideoButton(titleContainer) {
+  let videoId = getVideoId(titleContainer);
   if (!videoId) return;
 
-  dlButton.setAttribute('data-id', videoId);
-  dlButton.setAttribute('data-type', 'video');
-  dlButton.title = `TA download video: ${titleContainer.innerText} [${videoId}]`;
+  const dlButton = document.createElement('a');
+  dlButton.classList.add('ta-button');
+  dlButton.href = '#';
 
   Object.assign(dlButton.style, {
     display: 'flex',
@@ -435,7 +437,12 @@ function checkVideoExists(taButton) {
     console.error(e);
   }
 
-  let videoId = taButton.dataset.id;
+  if (!taButton.parentElement) return;
+  let videoId = getVideoId(taButton.parentElement);
+  taButton.setAttribute('data-id', videoId);
+  taButton.setAttribute('data-type', 'video');
+  taButton.title = `TA download video: ${taButton.parentElement.innerText} [${videoId}]`;
+
   let message = { type: 'videoExists', videoId };
   let sending = sendMessage(message);
   sending.then(handleResponse, handleError);
