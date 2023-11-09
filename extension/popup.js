@@ -78,6 +78,21 @@ document.getElementById('autostart').addEventListener('click', function () {
   toggleAutostart();
 });
 
+
+let fullUrlInput = document.getElementById('full-url');
+fullUrlInput.addEventListener('change', () => {
+  browserType.storage.local.set({
+    popupFullUrl: fullUrlInput.value,
+  });
+});
+
+let apiKeyInput = document.getElementById('api-key');
+apiKeyInput.addEventListener('change', () => {
+  browserType.storage.local.set({
+    popupApiKey: apiKeyInput.value,
+  });
+});
+
 function sendCookie() {
   console.log('popup send cookie');
   clearError();
@@ -179,11 +194,18 @@ function setStatusIcon(connected) {
   }
 }
 
+
 // fill in form
 document.addEventListener('DOMContentLoaded', async () => {
   function onGot(item) {
     if (!item.access) {
       console.log('no access details found');
+      if (item.popupFullUrl != null && fullUrlInput.value === '') {
+        fullUrlInput.value = item.popupFullUrl;
+      }
+      if (item.popupApiKey != null && apiKeyInput.value === '') {
+        apiKeyInput.value = item.popupApiKey;
+      }
       setStatusIcon(false);
       return;
     }
@@ -217,7 +239,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('autostart').checked = true;
   }
 
-  browserType.storage.local.get('access', function (result) {
+  browserType.storage.local.get(['access', 'popupFullUrl', 'popupApiKey'], function (result) {
     onGot(result);
   });
 
