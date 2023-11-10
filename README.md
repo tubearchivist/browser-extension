@@ -77,6 +77,7 @@ Symlink/copy the correct manifest file for your browser to the expected location
 ## Roadmap
 Join us on [Discord](https://www.tubearchivist.com/discord) and help us improve and extend this project. This is a list of planned features, in no particular order:
 - [ ] Implement download/subscribe button for playlists
+- [ ] Add download buttons to the `/shorts/` pages
 - [X] Get download and subscribe status from TA to show on the injected buttons
 - [X] Implement download button for videos on the YouTube homepage over inline preview
 - [X] Implement download button for videos on playlist
