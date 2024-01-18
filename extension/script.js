@@ -348,20 +348,6 @@ function buildVideoButton(titleContainer) {
   dlButton.classList.add('ta-button');
   dlButton.href = '#';
 
-  Object.assign(dlButton.style, {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#00202f',
-    color: '#fff',
-    fontSize: '1.4rem',
-    textDecoration: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    height: 'fit-content',
-    opacity: 0,
-  });
-
   let dlIcon = document.createElement('span');
   dlIcon.innerHTML = defaultIcon;
   Object.assign(dlIcon.style, {
@@ -394,10 +380,12 @@ function getNearestLink(element) {
 
 function processTitle(titleContainer) {
   if (titleContainer.hasListener) return;
-  Object.assign(titleContainer.style, {
-    display: 'flex',
-    gap: '15px',
-  });
+  titleContainer.classList.add("ta-title-container");
+
+  if (titleContainer.style.display === "-webkit-box") {
+    // Compatibility with DeArrow
+    titleContainer.style.setProperty("display", "flex", "important");
+  }
 
   titleContainer.classList.add('title-container');
   titleContainer.addEventListener('mouseenter', () => {

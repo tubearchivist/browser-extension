@@ -1,0 +1,18 @@
+.ta-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #00202f;
+    color: #fff;
+    font-size: 1.4rem;
+    text-decoration: none;
+    border-radius: 8px;
+    cursor: pointer;
+    height: fit-content;
+    opacity: 0;
+}
+
+.ta-title-container {
+    display: flex;
+    gap: 15px;
+}
