@@ -437,11 +437,13 @@ function checkVideoExists(taButton) {
     console.error(e);
   }
 
-  if (!taButton.parentElement) return;
-  let videoId = getVideoId(taButton.parentElement);
-  taButton.setAttribute('data-id', videoId);
-  taButton.setAttribute('data-type', 'video');
-  taButton.title = `TA download video: ${taButton.parentElement.innerText} [${videoId}]`;
+  let videoId = taButton.dataset.id;
+  if (taButton.parentElement) {
+    videoId = getVideoId(taButton.parentElement);
+    taButton.setAttribute('data-id', videoId);
+    taButton.setAttribute('data-type', 'video');
+    taButton.title = `TA download video: ${taButton.parentElement.innerText} [${videoId}]`;
+  }
 
   let message = { type: 'videoExists', videoId };
   let sending = sendMessage(message);
