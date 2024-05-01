@@ -135,12 +135,14 @@ function ensureTALinks() {
 
   let titleContainerNodes = getTitleContainers();
   for (let titleContainer of titleContainerNodes) {
-    if (titleContainer.hasTA) continue;
+    let parent = getNearestH3(titleContainer);
+    if (!parent) continue;
+    if (parent.hasTA) continue;
     let videoButton = buildVideoButton(titleContainer);
     if (videoButton == null) continue;
-    processTitle(titleContainer);
-    titleContainer.appendChild(videoButton);
-    titleContainer.hasTA = true;
+    processTitle(parent);
+    parent.appendChild(videoButton);
+    parent.hasTA = true;
   }
 }
 ensureTALinks = throttled(ensureTALinks, 700);
@@ -329,6 +331,8 @@ function getTitleContainers() {
 }
 
 function getVideoId(titleContainer) {
+  if (!titleContainer) return undefined;
+
   let href = getNearestLink(titleContainer);
   if (!href) return;
 
@@ -394,6 +398,16 @@ function getNearestLink(element) {
   return null;
 }
 
+function getNearestH3(element) {
+  for (let i = 0; i < 5 && element && element !== document; i++) {
+    if (element.tagName === 'H3') {
+      return element;
+    }
+    element = element.parentNode;
+  }
+  return null;
+}
+
 function processTitle(titleContainer) {
   if (titleContainer.hasListener) return;
   Object.assign(titleContainer.style, {
@@ -439,9 +453,9 @@ function checkVideoExists(taButton) {
     console.error(e);
   }
 
-  let videoId = taButton.dataset.id;
-  if (taButton.parentElement) {
-    videoId = getVideoId(taButton.parentElement);
+  let aElem = taButton?.parentElement?.querySelector('a');
+  let videoId = getVideoId(aElem);;
+  if (aElem) {
     taButton.setAttribute('data-id', videoId);
     taButton.setAttribute('data-type', 'video');
     taButton.title = `TA download video: ${taButton.parentElement.innerText} [${videoId}]`;
