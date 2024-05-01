@@ -83,7 +83,6 @@ document.getElementById('autostart').addEventListener('click', function () {
   toggleAutostart();
 });
 
-
 let fullUrlInput = document.getElementById('full-url');
 fullUrlInput.addEventListener('change', () => {
   browserType.storage.local.set({
@@ -199,7 +198,6 @@ function setStatusIcon(connected) {
     statusIcon.style.color = 'red';
   }
 }
-
 
 // fill in form
 document.addEventListener('DOMContentLoaded', async () => {
