@@ -208,6 +208,7 @@ function buildCookieLine(cookie) {
 
 async function sendCookies() {
   console.log('function sendCookies');
+  const acceptableDomains = ['.youtube.com', 'youtube.com', 'www.youtube.com'];
 
   let cookieStores = await browserType.cookies.getAllCookieStores();
   let cookieLines = [
@@ -223,7 +224,9 @@ async function sendCookies() {
     });
     for (let j = 0; j < allCookiesStore.length; j++) {
       const cookie = allCookiesStore[j];
-      cookieLines.push(buildCookieLine(cookie));
+      if (acceptableDomains.includes(cookie.domain)) {
+        cookieLines.push(buildCookieLine(cookie));
+      }
     }
   }
 
