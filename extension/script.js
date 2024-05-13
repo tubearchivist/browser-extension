@@ -389,6 +389,24 @@ function buildVideoButton(titleContainer) {
 }
 
 function getNearestLink(element) {
+  // Check siblings
+  let sibling = element;
+  while (sibling) {
+    sibling = sibling.previousElementSibling;
+    if (sibling && sibling.tagName === 'A' && sibling.getAttribute('href') !== '#') {
+      return sibling.getAttribute('href');
+    }
+  }
+
+  sibling = element;
+  while (sibling) {
+    sibling = sibling.nextElementSibling;
+    if (sibling && sibling.tagName === 'A' && sibling.getAttribute('href') !== '#') {
+      return sibling.getAttribute('href');
+    }
+  }
+
+  // Check parent elements
   for (let i = 0; i < 5 && element && element !== document; i++) {
     if (element.tagName === 'A' && element.getAttribute('href') !== '#') {
       return element.getAttribute('href');
@@ -453,12 +471,14 @@ function checkVideoExists(taButton) {
     console.error(e);
   }
 
-  let aElem = taButton?.parentElement?.querySelector('a');
-  let videoId = getVideoId(aElem);;
-  if (aElem) {
-    taButton.setAttribute('data-id', videoId);
-    taButton.setAttribute('data-type', 'video');
-    taButton.title = `TA download video: ${taButton.parentElement.innerText} [${videoId}]`;
+  let videoId = taButton.dataset.id;
+  if (!videoId) {
+    videoId = getVideoId(taButton);
+    if (videoId) {
+      taButton.setAttribute('data-id', videoId);
+      taButton.setAttribute('data-type', 'video');
+      taButton.title = `TA download video: ${taButton.parentElement.innerText} [${videoId}]`;
+    }
   }
 
   let message = { type: 'videoExists', videoId };
