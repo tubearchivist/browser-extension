@@ -243,6 +243,7 @@ function buildChannelSubButton(channelHandle) {
     } else {
       console.log('Unknown state');
     }
+    e.stopPropagation();
   });
   Object.assign(channelSubButton.style, {
     padding: '5px',
@@ -304,6 +305,7 @@ function buildChannelDownloadButton() {
     e.preventDefault();
     console.log(`download: ${currentLocation}`);
     sendDownload(channelDownloadButton);
+    e.stopPropagation();
   });
   Object.assign(channelDownloadButton.style, {
     filter: 'invert()',
