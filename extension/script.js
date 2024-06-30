@@ -106,7 +106,7 @@ function getBrowser() {
 }
 
 function getChannelContainers() {
-  const elements = document.querySelectorAll('.yt-flexible-actions-view-model-wiz, #owner');
+  const elements = document.querySelectorAll('#inner-header-container, #owner');
   const channelContainerNodes = [];
 
   elements.forEach(element => {
@@ -198,9 +198,7 @@ function getChannelHandle(channelContainer) {
   const videoOwnerRenderer = channelContainer.querySelector('.ytd-video-owner-renderer');
 
   if (!videoOwnerRenderer) {
-    const channelHandleContainer = document.querySelector(
-      '.yt-content-metadata-view-model-wiz__metadata-text'
-    );
+    const channelHandleContainer = document.querySelector('#channel-handle');
     channelHandle = channelHandleContainer ? channelHandleContainer.innerText : null;
   } else {
     const href = videoOwnerRenderer.href;
