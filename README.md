@@ -45,7 +45,7 @@ After a new release here on GitHub, you'll get updates automatically in your bro
 
 ## Setup
 - **URL**: This is where your Tube Archivist instance is located. Can be a host name or an IP address. Add the port if needed at the end, e.g. `:8000`.
-- **API key**: You can find your API key on the settings page (Settings -> Application -> Integrations section) of your Tube Archivist instance.
+- **API key**: You can find your API key on the settings page (Settings -> Application -> Integrations section -> API token) of your Tube Archivist instance.
 
 A green checkmark will appear next to the *Save* button if your connection is working.
 
