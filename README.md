@@ -2,8 +2,8 @@
 
 <h1 align="center">Browser Extension for Tube Archivist</h1>
 <div align="center">
-<a href="https://www.tilefy.me" target="_blank"><img src="https://tiles.tilefy.me/t/tubearchivist-firefox.png" alt="tubearchivist-firefox" title="TA Companion Firefox users" height="50" width="190"/></a>
-<a href="https://www.tilefy.me" target="_blank"><img src="https://tiles.tilefy.me/t/tubearchivist-chrome.png" alt="tubearchivist-chrome" title="TA Companion Chrome users" height="50" width="190"/></a>
+<a href="https://addons.mozilla.org/addon/tubearchivist-companion/" target="_blank"><img src="https://tiles.tilefy.me/t/tubearchivist-firefox.png" alt="tubearchivist-firefox" title="TA Companion Firefox users" height="50" width="190"/></a>
+<a href="https://chrome.google.com/webstore/detail/tubearchivist-companion/jjnkmicfnfojkkgobdfeieblocadmcie" target="_blank"><img src="https://tiles.tilefy.me/t/tubearchivist-chrome.png" alt="tubearchivist-chrome" title="TA Companion Chrome users" height="50" width="190"/></a>
 </div>
 
 ## Core Functionality
@@ -45,7 +45,7 @@ After a new release here on GitHub, you'll get updates automatically in your bro
 
 ## Setup
 - **URL**: This is where your Tube Archivist instance is located. Can be a host name or an IP address. Add the port if needed at the end, e.g. `:8000`.
-- **API key**: You can find your API key on the settings page of your Tube Archivist instance.
+- **API key**: You can find your API key on the settings page (Settings -> Application -> Integrations section -> API token) of your Tube Archivist instance.
 
 A green checkmark will appear next to the *Save* button if your connection is working.
 
