@@ -195,9 +195,12 @@ async function cookieStr(cookieLines) {
 }
 
 function buildCookieLine(cookie) {
+  // 2nd argument controls subdomains, and must match leading dot in domain
+  let includeSubdomains = cookie.domain.startsWith('.') ? 'TRUE' : 'FALSE';
+
   return [
     cookie.domain,
-    'TRUE',
+    includeSubdomains,
     cookie.path,
     cookie.httpOnly.toString().toUpperCase(),
     Math.trunc(cookie.expirationDate) || 0,
