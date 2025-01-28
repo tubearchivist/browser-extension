@@ -143,45 +143,15 @@ async function videoExists(id) {
   return new URL(`video/${id}/`, `${access.url}:${access.port}/`).href;
 }
 
-async function getChannelCache() {
-  let cache = await browserType.storage.local.get('cache');
-  if (cache.cache) return cache;
-  return { cache: {} };
-}
-
-async function setChannel(channelHandler, channelId) {
-  let cache = await getChannelCache();
-  cache.cache[channelHandler] = { id: channelId, timestamp: Date.now() };
-  browserType.storage.local.set(cache);
-}
-
-async function getChannelId(channelHandle) {
-  let cache = await getChannelCache();
-
-  if (cache.cache[channelHandle]) {
-    return cache.cache[channelHandle]?.id;
-  }
-
-  let channel = await searchChannel(channelHandle);
-  if (channel) setChannel(channelHandle, channel.channel_id);
-
-  return channel.channel_id;
-}
-
-async function searchChannel(channelHandle) {
-  const path = `api/channel/search/?q=${channelHandle}`;
-  let response = await sendGet(path);
-  return response.data;
-}
-
 async function getChannel(channelHandle) {
-  let channelId = await getChannelId(channelHandle);
-  if (!channelId) return;
-
-  const path = `api/channel/${channelId}/`;
-  let response = await sendGet(path);
-
-  return response.data;
+  let channel;
+  const path = `api/channel/search/?q=${channelHandle}`;
+  try {
+    channel = await sendGet(path);
+    return channel.data;
+  } catch {
+    return false;
+  }
 }
 
 async function cookieStr(cookieLines) {
@@ -308,8 +278,8 @@ function handleMessage(request, sender, sendResponse) {
         return await subscribe(request.url, true);
       }
       case 'unsubscribe': {
-        let channelId = await getChannelId(request.url);
-        return await subscribe(channelId, false);
+        let channel = await getChannel(request.url);
+        return await subscribe(channel.channel_id, false);
       }
       case 'videoExists': {
         return await videoExists(request.videoId);
