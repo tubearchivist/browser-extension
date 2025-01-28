@@ -70,6 +70,9 @@ Symlink/copy the correct manifest file for your browser to the expected location
   - Open the folder containing the *manifest.json* file.
   - Click on *Service Worker* to open the dev tools at background.js. 
 
+Note:
+- If you are running your TA dev setup outside of the container, you need to point the URL to the backend and _not_ the frontend. E.g. localhost:8000 and not localhost:3000.
+
 ## Compatibility
 - Verify that you are running the [latest version](https://github.com/tubearchivist/tubearchivist/releases/latest) of Tube Archivist as the API is under development and will change.
 - For testing this extension between releases, use the *unstable* builds of Tube Archivist, only for your testing environment.
