@@ -147,7 +147,7 @@ function toggleAutostart() {
 }
 
 // send ping message to TA backend
-function pingBackend() {
+async function pingBackend() {
   clearError();
   clearTempLocalStorage();
   function handleResponse() {
@@ -179,7 +179,10 @@ function setCookieState() {
     if (!message.cookie_enabled) {
       document.getElementById('sendCookiesStatus').innerText = 'disabled';
     } else {
-      let validattionMessage = `enabled, last verified ${message.validated_str}`;
+      let validattionMessage = 'enabled';
+      if (message.validated_str) {
+        validattionMessage += `, last verified ${message.validated_str}`;
+      }
       document.getElementById('sendCookiesStatus').innerText = validattionMessage;
     }
   }
@@ -209,7 +212,7 @@ function setStatusIcon(connected) {
 
 // fill in form
 document.addEventListener('DOMContentLoaded', async () => {
-  function onGot(item) {
+  async function onGot(item) {
     if (!item.access) {
       console.log('no access details found');
       if (item.popupFullUrl != null && fullUrlInput.value === '') {
@@ -233,7 +236,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     setCookieState();
   }
 
-  function setContinuousCookiesOptions(result) {
+  async function setContinuousCookiesOptions(result) {
     if (!result.continuousSync || result.continuousSync.checked === false) {
       console.log('continuous cookie sync not set');
       return;
@@ -242,7 +245,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('continuous-sync').checked = true;
   }
 
-  function setAutostartOption(result) {
+  async function setAutostartOption(result) {
     console.log(result);
     if (!result.autostart || result.autostart.checked === false) {
       console.log('autostart not set');
@@ -263,5 +266,4 @@ document.addEventListener('DOMContentLoaded', async () => {
   browserType.storage.local.get('autostart', function (result) {
     setAutostartOption(result);
   });
-
 });
