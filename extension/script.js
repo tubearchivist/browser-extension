@@ -106,7 +106,9 @@ function getBrowser() {
 }
 
 function getChannelContainers() {
-  const elements = document.querySelectorAll('.page-header-view-model-wiz__page-header-flexible-actions, #owner');
+  const elements = document.querySelectorAll(
+    '.page-header-view-model-wiz__page-header-flexible-actions, #owner'
+  );
   const channelContainerNodes = [];
 
   elements.forEach(element => {
@@ -194,15 +196,13 @@ function buildChannelButton(channelContainer) {
 }
 
 function getChannelHandle(channelContainer) {
-
   function findeHandleString(container) {
     let result = null;
-  
+
     function recursiveTraversal(element) {
       for (let child of element.children) {
-
-        if (child.tagName === "A" && child.hasAttribute("href")) {
-          const href = child.getAttribute("href");
+        if (child.tagName === 'A' && child.hasAttribute('href')) {
+          const href = child.getAttribute('href');
           const match = href.match(/\/@[^/]+/); // Match the path starting with "@"
           if (match) {
             // handle is in channel link
@@ -211,17 +211,17 @@ function getChannelHandle(channelContainer) {
           }
         }
 
-        if (child.children.length === 0 && child.textContent.trim().startsWith("@")) {
+        if (child.children.length === 0 && child.textContent.trim().startsWith('@')) {
           // handle is in channel description text
           result = child.textContent.trim();
           return;
         }
-  
+
         recursiveTraversal(child);
         if (result) return;
       }
     }
-  
+
     recursiveTraversal(container);
     return result;
   }
