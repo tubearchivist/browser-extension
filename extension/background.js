@@ -77,7 +77,7 @@ async function getAccess() {
 
 // check if cookie is valid
 async function getCookieState() {
-  const path = 'api/cookie/';
+  const path = 'api/appsettings/cookie/';
   let response = await sendGet(path);
   console.log('cookie state: ' + JSON.stringify(response));
 
@@ -185,7 +185,7 @@ async function getChannel(channelHandle) {
 }
 
 async function cookieStr(cookieLines) {
-  const path = 'api/cookie/';
+  const path = 'api/appsettings/cookie/';
   let payload = {
     cookie: cookieLines.join('\n'),
   };
