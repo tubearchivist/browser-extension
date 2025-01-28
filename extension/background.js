@@ -296,7 +296,7 @@ function handleMessage(request, sender, sendResponse) {
   })()
     .then(value => sendResponse({ success: true, value }))
     .catch(e => {
-      console.error(e);
+      console.log(e);
       let message = e?.message ?? e;
       if (message === 'Failed to fetch') {
         // chrome's error message for failed `fetch` is not very user-friendly
@@ -311,6 +311,6 @@ browserType.runtime.onMessage.addListener(handleMessage);
 
 browserType.runtime.onInstalled.addListener(() => {
   browserType.storage.local.get('continuousSync', data => {
-    handleContinuousCookie(data?.continuousSync.checked);
+    handleContinuousCookie(data?.continuousSync?.checked || false);
   });
 });

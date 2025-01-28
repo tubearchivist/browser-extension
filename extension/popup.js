@@ -230,6 +230,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('api-key').value = item.access.apiKey;
     pingBackend();
     addUrl(item.access);
+    setCookieState();
   }
 
   function setContinuousCookiesOptions(result) {
@@ -263,5 +264,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     setAutostartOption(result);
   });
 
-  setCookieState();
 });
