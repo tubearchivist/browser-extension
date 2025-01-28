@@ -47,7 +47,7 @@ async function sendData(path, payload, method) {
   let access = await getAccess();
   const url = `${access.url}:${access.port}/${path}`;
   console.log(`${method}: ${url}`);
-  console.log(`${method}: ${JSON.stringify(payload)}`);
+  if (!path.endsWith('cookie/')) console.log(`${method}: ${JSON.stringify(payload)}`);
 
   try {
     const rawResponse = await fetch(url, {
@@ -238,6 +238,35 @@ async function sendCookies() {
   return response;
 }
 
+let listenerEnabled = false;
+let isThrottled = false;
+
+async function handleContinuousCookie(checked) {
+  if (checked === true) {
+    browserType.cookies.onChanged.addListener(onCookieChange);
+    listenerEnabled = true;
+    console.log('Cookie listener enabled');
+  } else {
+    browserType.cookies.onChanged.removeListener(onCookieChange);
+    listenerEnabled = false;
+    console.log('Cookie listener disabled');
+  }
+}
+
+function onCookieChange(changeInfo) {
+  if (!isThrottled) {
+    isThrottled = true;
+
+    console.log('Cookie event detected:', changeInfo);
+
+    sendCookies();
+
+    setTimeout(() => {
+      isThrottled = false;
+    }, 10000);
+  }
+}
+
 /*
 process and return message if needed
 the following messages are supported:
@@ -245,6 +274,7 @@ type Message =
   | { type: 'verify' }
   | { type: 'cookieState' }
   | { type: 'sendCookie' }
+  | { type: 'continuousSync', checked: boolean }
   | { type: 'download', url: string }
   | { type: 'subscribe', url: string }
   | { type: 'unsubscribe', url: string }
@@ -267,6 +297,9 @@ function handleMessage(request, sender, sendResponse) {
       }
       case 'sendCookie': {
         return await sendCookies();
+      }
+      case 'continuousSync': {
+        return await handleContinuousCookie(request.checked);
       }
       case 'download': {
         return await download(request.url);
@@ -305,3 +338,9 @@ function handleMessage(request, sender, sendResponse) {
 }
 
 browserType.runtime.onMessage.addListener(handleMessage);
+
+browserType.runtime.onInstalled.addListener(() => {
+  browserType.storage.local.get('continuousSync', data => {
+    handleContinuousCookie(data?.continuousSync.checked);
+  });
+});

@@ -78,6 +78,11 @@ document.getElementById('sendCookies').addEventListener('click', function () {
   sendCookie();
 });
 
+// continuous sync
+document.getElementById('continuous-sync').addEventListener('click', function () {
+  toggleContinuousSync();
+});
+
 // autostart
 document.getElementById('autostart').addEventListener('click', function () {
   toggleAutostart();
@@ -103,8 +108,8 @@ function sendCookie() {
 
   function handleResponse(message) {
     console.log('handle cookie response: ' + JSON.stringify(message));
-    let cookie_validated = message.cookie_validated;
-    document.getElementById('sendCookiesStatus').innerText = 'validated: ' + cookie_validated;
+    let validattionMessage = `enabled, last verified ${message.validated_str}`;
+    document.getElementById('sendCookiesStatus').innerText = validattionMessage;
   }
 
   function handleError(error) {
@@ -112,20 +117,21 @@ function sendCookie() {
     setError(error);
   }
 
-  let checked = document.getElementById('sendCookies').checked;
+  let sending = sendMessage({ type: 'sendCookie' });
+  sending.then(handleResponse, handleError);
+}
+
+function toggleContinuousSync() {
+  const checked = document.getElementById('continuous-sync').checked;
   let toStore = {
-    sendCookies: {
+    continuousSync: {
       checked: checked,
     },
   };
   browserType.storage.local.set(toStore, function () {
     console.log('stored option: ' + JSON.stringify(toStore));
   });
-  if (checked === false) {
-    return;
-  }
-  let sending = sendMessage({ type: 'sendCookie' });
-  sending.then(handleResponse, handleError);
+  sendMessage({ type: 'continuousSync', checked });
 }
 
 function toggleAutostart() {
@@ -170,9 +176,11 @@ function setCookieState() {
   clearError();
   function handleResponse(message) {
     console.log(message);
-    document.getElementById('sendCookies').checked = message.cookie_enabled;
-    if (message.validated_str) {
-      document.getElementById('sendCookiesStatus').innerText = message.validated_str;
+    if (!message.cookie_enabled) {
+      document.getElementById('sendCookiesStatus').innerText = 'disabled';
+    } else {
+      let validattionMessage = `enabled, last verified ${message.validated_str}`;
+      document.getElementById('sendCookiesStatus').innerText = validattionMessage;
     }
   }
 
@@ -224,13 +232,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     addUrl(item.access);
   }
 
-  function setCookiesOptions(result) {
-    if (!result.sendCookies || result.sendCookies.checked === false) {
-      console.log('sync cookies not set');
+  function setContinuousCookiesOptions(result) {
+    if (!result.continuousSync || result.continuousSync.checked === false) {
+      console.log('continuous cookie sync not set');
       return;
     }
     console.log('set options: ' + JSON.stringify(result));
-    setCookieState();
+    document.getElementById('continuous-sync').checked = true;
   }
 
   function setAutostartOption(result) {
@@ -247,11 +255,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     onGot(result);
   });
 
-  browserType.storage.local.get('sendCookies', function (result) {
-    setCookiesOptions(result);
+  browserType.storage.local.get('continuousSync', function (result) {
+    setContinuousCookiesOptions(result);
   });
 
   browserType.storage.local.get('autostart', function (result) {
     setAutostartOption(result);
   });
+
+  setCookieState();
 });
