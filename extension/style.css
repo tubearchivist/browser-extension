@@ -42,7 +42,7 @@ button:hover {
     position: relative;
 }
 .logo img {
-    width: 100%;
+    width: 400px;
 }
 .logo span {
     position: absolute;
