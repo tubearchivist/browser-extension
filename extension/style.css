@@ -81,3 +81,8 @@ button:hover {
     color: red;
     display: none; /* will be made visible when an error occurs */
 }
+#cookieLinesResponse {
+    display: none;
+    width: 100%;
+    height: 50px;
+}

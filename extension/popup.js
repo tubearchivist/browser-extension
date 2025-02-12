@@ -78,6 +78,11 @@ document.getElementById('sendCookies').addEventListener('click', function () {
   sendCookie();
 });
 
+// show cookies
+document.getElementById('showCookies').addEventListener('click', function () {
+  showCookies();
+});
+
 // continuous sync
 document.getElementById('continuous-sync').addEventListener('click', function () {
   toggleContinuousSync();
@@ -119,6 +124,29 @@ function sendCookie() {
 
   let sending = sendMessage({ type: 'sendCookie' });
   sending.then(handleResponse, handleError);
+}
+
+function showCookies() {
+  console.log('popup show cookies');
+  const textArea = document.getElementById('cookieLinesResponse');
+
+  function handleResponse(message) {
+    textArea.value = message.join('\n');
+    textArea.style.display = 'initial';
+  }
+  function handleError(error) {
+    console.log(`Error: ${error}`);
+  }
+
+  if (textArea.value) {
+    textArea.value = '';
+    textArea.style.display = 'none';
+    document.getElementById('showCookies').textContent = 'Show Cookie';
+  } else {
+    let sending = sendMessage({ type: 'getCookieLines' });
+    sending.then(handleResponse, handleError);
+    document.getElementById('showCookies').textContent = 'Hide Cookie';
+  }
 }
 
 function toggleContinuousSync() {

@@ -179,10 +179,8 @@ function buildCookieLine(cookie) {
   ].join('\t');
 }
 
-async function sendCookies() {
-  console.log('function sendCookies');
+async function getCookieLines() {
   const acceptableDomains = ['.youtube.com', 'youtube.com', 'www.youtube.com'];
-
   let cookieStores = await browserType.cookies.getAllCookieStores();
   let cookieLines = [
     '# Netscape HTTP Cookie File',
@@ -202,7 +200,12 @@ async function sendCookies() {
       }
     }
   }
+  return cookieLines;
+}
 
+async function sendCookies() {
+  console.log('function sendCookies');
+  let cookieLines = await getCookieLines();
   let response = cookieStr(cookieLines);
 
   return response;
@@ -244,6 +247,7 @@ type Message =
   | { type: 'verify' }
   | { type: 'cookieState' }
   | { type: 'sendCookie' }
+  | { type: 'getCookieLines' }
   | { type: 'continuousSync', checked: boolean }
   | { type: 'download', url: string }
   | { type: 'subscribe', url: string }
@@ -267,6 +271,9 @@ function handleMessage(request, sender, sendResponse) {
       }
       case 'sendCookie': {
         return await sendCookies();
+      }
+      case 'getCookieLines': {
+        return await getCookieLines();
       }
       case 'continuousSync': {
         return await handleContinuousCookie(request.checked);
