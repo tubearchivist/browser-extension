@@ -138,7 +138,7 @@ async function subscribe(url, subscribed) {
 async function videoExists(id) {
   const path = `api/video/${id}/`;
   let response = await sendGet(path);
-  if (!response.data) return false;
+  if (response?.error) return false;
   let access = await getAccess();
   return new URL(`video/${id}/`, `${access.url}:${access.port}/`).href;
 }
