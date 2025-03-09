@@ -50,7 +50,9 @@ After a new release here on GitHub, you'll get updates automatically in your bro
 A green checkmark will appear next to the *Save* button if your connection is working.
 
 ## Options
-- **Sync YouTube cookies**: Send your cookies to TubeArchivist to use for yt-dlp requests.
+- **Continuous Cookie Sync**: Automatically and continuously update the cookie on change.
+- **Copy Now**: Copy the cookie now to TA.
+- **Show Cookie**: Show the cookie on click, for copy paste. 
 - **Autostart**: Autostart and prioritize videos send from this extension.
 
 ## Test this extension
