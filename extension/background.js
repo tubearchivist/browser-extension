@@ -144,11 +144,9 @@ async function videoExists(id) {
 }
 
 async function getChannel(channelHandle) {
-  let channel;
   const path = `api/channel/search/?q=${channelHandle}`;
   try {
-    channel = await sendGet(path);
-    return channel.data;
+    return await sendGet(path);
   } catch {
     return false;
   }
