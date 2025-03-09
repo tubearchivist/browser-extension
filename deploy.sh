@@ -3,8 +3,8 @@
 
 set -e
 
-if [[ $(basename "$(pwd)") != 'tubearchivist_browserextension' ]]; then
-    echo 'not in tubearchivist_browserextension folder'
+if [[ $(basename "$(pwd)") != 'browser-extension' ]]; then
+    echo 'not in browser-extension folder'
     exit 1
 fi
 
