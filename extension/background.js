@@ -314,7 +314,7 @@ function handleMessage(request, sender, sendResponse) {
 
 browserType.runtime.onMessage.addListener(handleMessage);
 
-browserType.runtime.onInstalled.addListener(() => {
+browserType.runtime.onStartup.addListener(() => {
   browserType.storage.local.get('continuousSync', data => {
     handleContinuousCookie(data?.continuousSync?.checked || false);
   });
