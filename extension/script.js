@@ -107,7 +107,7 @@ function getBrowser() {
 
 function getChannelContainers() {
   const elements = document.querySelectorAll(
-    '.page-header-view-model-wiz__page-header-flexible-actions, #owner'
+     '.yt-page-header-view-model__page-header-flexible-actions, #owner'
   );
   const channelContainerNodes = [];
 
