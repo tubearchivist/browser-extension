@@ -107,7 +107,7 @@ function getBrowser() {
 
 function getChannelContainers() {
   const elements = document.querySelectorAll(
-     '.yt-page-header-view-model__page-header-flexible-actions, #owner'
+    'yt-flexible-actions-view-model:has(.ytSubscribeButtonViewModelContainer), #owner, ytd-channel-renderer'
   );
   const channelContainerNodes = [];
 
@@ -122,6 +122,16 @@ function getChannelContainers() {
 
 function isElementVisible(element) {
   return element.offsetWidth > 0 || element.offsetHeight > 0 || element.getClientRects().length > 0;
+}
+
+function getCurrentLocationUrlObject() {
+  let currentLocation = window.location.href;
+  let urlObj = new URL(currentLocation);
+
+  return {
+    currentLocation,
+    urlObj,
+  };
 }
 
 function ensureTALinks() {
@@ -228,6 +238,26 @@ function getChannelHandle(channelContainer) {
 
   let channelHandle = findeHandleString(channelContainer.parentElement);
 
+  // Alternate, handling 1 specific edge case
+  function findChannelId() {
+    let { urlObj } = getCurrentLocationUrlObject();
+
+    if (!channelHandle && (urlObj.pathname.startsWith('/c/') || urlObj.pathname.startsWith('/channel/'))) {
+      // channel page only
+      console.log("trying method 2");
+      channelHandle = Array.from(document.querySelectorAll("script")).filter((scriptEl) => {
+          return (scriptEl.innerText.includes("ytInitialData ="));
+        })?.[0].innerText.match(/(?<=externalId":")[^"]+/g)?.[0];
+    }
+
+    if (!channelHandle && urlObj.pathname.startsWith('/watch')) {
+      // video page only
+      console.log("trying method 3");
+      channelHandle = new URL(document.querySelector("a[href*='/channel'][href*='view_as']").href).pathname.split("/")[2];
+    }
+  }
+  findChannelId();
+
   return channelHandle;
 }
 
@@ -307,8 +337,7 @@ function buildSpacer() {
 
 function buildChannelDownloadButton() {
   let channelDownloadButton = document.createElement('span');
-  let currentLocation = window.location.href;
-  let urlObj = new URL(currentLocation);
+  let { currentLocation, urlObj } = getCurrentLocationUrlObject();
 
   if (urlObj.pathname.startsWith('/watch')) {
     let params = new URLSearchParams(document.location.search);
