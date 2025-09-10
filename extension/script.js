@@ -107,7 +107,7 @@ function getBrowser() {
 
 function getChannelContainers() {
   const elements = document.querySelectorAll(
-     '.yt-page-header-view-model__page-header-flexible-actions, #owner'
+    'yt-flexible-actions-view-model:has(.ytSubscribeButtonViewModelContainer), #owner, ytd-channel-renderer'
   );
   const channelContainerNodes = [];
 
