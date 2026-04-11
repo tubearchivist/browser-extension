@@ -93,4 +93,4 @@ Join us on [Discord](https://www.tubearchivist.com/discord) and help us improve 
 The JavaScript does not require any build step; you just edit the files directly. However, there is config for eslint and prettier (a linter and formatter respectively); their use is recommended but not required. To use them, install `node`, run `npm i` from the root directory of this repository to install dependencies, then run `npm run lint` and `npm run format` to run eslint and prettier respectively.
 
 ## Updating Artwork
-Google listing is *very* picky. Screenshots need to be exactly **1280x800** in resolution and need to be in *jpg* or *png* without alpha canal.
+Google listing is *very* picky. Screenshots need to be exactly **1280x800** in resolution and need to be in *jpg* or *png* without alpha channel.
