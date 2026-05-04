@@ -89,6 +89,13 @@ const defaultIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
 
 let browserType = getBrowser();
 
+// white list selectors, need to update from time to time
+const videoAnchorSelector = [
+  'a.ytLockupMetadataViewModelTitle[href]',
+  'a.shortsLockupViewModelHostEndpoint.shortsLockupViewModelHostOutsideMetadataEndpoint[href]',
+  'a#video-title[href]',
+].join(', ');
+
 // boilerplate to dedect browser type api
 function getBrowser() {
   if (typeof chrome !== 'undefined') {
@@ -135,17 +142,7 @@ function ensureTALinks() {
     channelContainer.hasTA = true;
   }
 
-  let titleContainerNodes = getTitleContainers();
-  for (let titleContainer of titleContainerNodes) {
-    let parent = getNearestH3(titleContainer);
-    if (!parent) continue;
-    if (parent.hasTA) continue;
-    let videoButton = buildVideoButton(titleContainer);
-    if (videoButton == null) continue;
-    processTitle(parent);
-    parent.appendChild(videoButton);
-    parent.hasTA = true;
-  }
+  ensureVideoButtons();
 }
 ensureTALinks = throttled(ensureTALinks, 700);
 
@@ -325,8 +322,13 @@ function buildChannelDownloadButton() {
   channelDownloadButton.innerHTML = downloadIcon;
   channelDownloadButton.addEventListener('click', e => {
     e.preventDefault();
-    console.log(`download: ${currentLocation}`);
-    sendDownload(channelDownloadButton);
+    if (channelDownloadButton.dataset.taUrl) {
+      let win = window.open(channelDownloadButton.dataset.taUrl, '_blank');
+      win.focus();
+    } else {
+      console.log(`download: ${currentLocation}`);
+      sendDownload(channelDownloadButton);
+    }
     e.stopPropagation();
   });
   Object.assign(channelDownloadButton.style, {
@@ -339,43 +341,40 @@ function buildChannelDownloadButton() {
   return channelDownloadButton;
 }
 
-function getTitleContainers() {
-  let elements = document.querySelectorAll('#video-title');
-  let videoNodes = [];
-  elements.forEach(element => {
-    if (isElementVisible(element)) {
-      videoNodes.push(element);
-    }
-  });
-  return elements;
-}
-
-function getVideoId(titleContainer) {
-  if (!titleContainer) return undefined;
-
-  let href = getNearestLink(titleContainer);
+function getVideoIdFromAnchor(anchor) {
+  if (!anchor) return undefined;
+  let href = anchor.getAttribute('href');
   if (!href) return;
 
-  let videoId;
-  if (href.startsWith('/watch?v')) {
-    let params = new URLSearchParams(href);
-    videoId = params.get('/watch?v');
-  } else if (href.startsWith('/shorts/')) {
-    videoId = href.split('/')[2];
+  let url;
+  try {
+    url = new URL(href, document.location.origin);
+  } catch {
+    return;
   }
+
+  if (url.hostname !== 'youtube.com' && !url.hostname.endsWith('.youtube.com')) return;
+
+  let videoId;
+  if (url.pathname === '/watch') {
+    videoId = url.searchParams.get('v');
+  } else if (url.pathname.startsWith('/shorts/')) {
+    videoId = url.pathname.split('/')[2];
+  }
+
   return videoId;
 }
 
-function buildVideoButton(titleContainer) {
-  let videoId = getVideoId(titleContainer);
-  if (!videoId) return;
-
+function buildVideoButton(videoId) {
   const dlButton = document.createElement('a');
   dlButton.classList.add('ta-button');
   dlButton.href = '#';
+  dlButton.setAttribute('data-id', videoId);
+  dlButton.setAttribute('data-type', 'video');
+  dlButton.title = `TA download video: ${videoId}`;
 
   Object.assign(dlButton.style, {
-    display: 'flex',
+    display: 'none',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#00202f',
@@ -384,8 +383,10 @@ function buildVideoButton(titleContainer) {
     textDecoration: 'none',
     borderRadius: '8px',
     cursor: 'pointer',
-    height: 'fit-content',
-    opacity: 0,
+    position: 'absolute',
+    top: '4px',
+    right: '4px',
+    zIndex: 1000,
   });
 
   let dlIcon = document.createElement('span');
@@ -401,104 +402,168 @@ function buildVideoButton(titleContainer) {
 
   dlButton.addEventListener('click', e => {
     e.preventDefault();
-    sendDownload(dlButton);
+    if (dlButton.dataset.taUrl) {
+      let win = window.open(dlButton.dataset.taUrl, '_blank');
+      win.focus();
+    } else {
+      sendDownload(dlButton);
+    }
     e.stopPropagation();
   });
 
   return dlButton;
 }
 
-function getNearestLink(element) {
-  // Check siblings
-  let sibling = element;
-  while (sibling) {
-    sibling = sibling.previousElementSibling;
-    if (sibling && sibling.tagName === 'A' && sibling.getAttribute('href') !== '#') {
-      return sibling.getAttribute('href');
-    }
-  }
-
-  sibling = element;
-  while (sibling) {
-    sibling = sibling.nextElementSibling;
-    if (sibling && sibling.tagName === 'A' && sibling.getAttribute('href') !== '#') {
-      return sibling.getAttribute('href');
-    }
-  }
-
-  // Check parent elements
-  for (let i = 0; i < 5 && element && element !== document; i++) {
-    if (element.tagName === 'A' && element.getAttribute('href') !== '#') {
-      return element.getAttribute('href');
-    }
-    element = element.parentNode;
-  }
-  return null;
+// handle clipped parent element to not cut TA button
+function isOverflowClipped(element) {
+  let style = getComputedStyle(element);
+  return [style.overflow, style.overflowX, style.overflowY].some(value => {
+    return value === 'hidden' || value === 'clip' || value === 'scroll' || value === 'auto';
+  });
 }
 
-function getNearestH3(element) {
-  for (let i = 0; i < 5 && element && element !== document; i++) {
-    if (element.tagName === 'H3') {
-      return element;
+// walk whitelisted anchor elements
+function getVideoButtonContainer(anchor, itemContainer) {
+  let container = anchor.parentElement;
+
+  while (container && container !== document.body && isOverflowClipped(container)) {
+    if (container === itemContainer && itemContainer.parentElement) {
+      return itemContainer.parentElement;
     }
-    element = element.parentNode;
+    container = container.parentElement;
   }
-  return null;
+
+  return container || itemContainer;
 }
 
-function processTitle(titleContainer) {
-  if (titleContainer.hasListener) return;
-  Object.assign(titleContainer.style, {
-    display: 'flex',
-    gap: '15px',
-  });
+function positionVideoButton(button) {
+  let anchor = button.taPlacementAnchor;
+  let container = button.taPlacementContainer;
+  if (!anchor || !container) return;
 
-  titleContainer.classList.add('title-container');
-  titleContainer.addEventListener('mouseenter', () => {
-    const taButton = titleContainer.querySelector('.ta-button');
-    if (!taButton) return;
-    if (!taButton.isChecked) checkVideoExists(taButton);
-    taButton.style.opacity = 1;
-  });
+  let anchorRect = anchor.getBoundingClientRect();
+  let containerRect = container.getBoundingClientRect();
+  let anchorStyle = getComputedStyle(anchor);
+  let paddingRight = parseFloat(anchorStyle.paddingRight) || 0;
 
-  titleContainer.addEventListener('mouseleave', () => {
-    const taButton = titleContainer.querySelector('.ta-button');
-    if (!taButton) return;
-    taButton.style.opacity = 0;
+  button.style.top = `${anchorRect.top - containerRect.top + 4}px`;
+  button.style.right = `${containerRect.right - anchorRect.right + paddingRight + 4}px`;
+}
+
+function ensureVideoButtons() {
+  document.querySelectorAll(videoAnchorSelector).forEach(anchor => {
+    if (!isElementVisible(anchor)) return;
+    if (anchor.closest('.ta-button, .ta-channel-button')) return;
+    if (!getVideoIdFromAnchor(anchor)) return;
+
+    ensureVideoButton(anchor);
   });
-  titleContainer.hasListener = true;
+}
+
+function ensureVideoButton(anchor) {
+  let videoId = getVideoIdFromAnchor(anchor);
+  if (!videoId) return null;
+  if (anchor.taButton && anchor.taButton.isConnected) return anchor.taButton;
+
+  let itemContainer = anchor.parentElement;
+  if (!itemContainer) return null;
+
+  itemContainer.taButtons = itemContainer.taButtons || [];
+
+  let button = itemContainer.taButtons.find(existingButton => {
+    return existingButton.isConnected && existingButton.dataset.id === videoId;
+  });
+  if (button) {
+    anchor.taButton = button;
+    return button;
+  }
+
+  let container = getVideoButtonContainer(anchor, itemContainer);
+  if (!container) return null;
+
+  button = buildVideoButton(videoId);
+  anchor.taButton = button;
+  container.taButton = button;
+  button.taItemContainer = itemContainer;
+  button.taPlacementAnchor = anchor;
+  button.taPlacementContainer = container;
+  if (getComputedStyle(container).position === 'static') {
+    container.taPreviousPosition = container.style.position;
+    container.style.position = 'relative';
+  }
+  positionVideoButton(button);
+  container.appendChild(button);
+  itemContainer.taButtons.push(button);
+  button.addEventListener('mouseenter', keepVideoButtonsVisible);
+  button.addEventListener('mouseleave', scheduleHideVideoButtons);
+  if (!itemContainer.taHoverListener) {
+    itemContainer.addEventListener('mouseenter', showVideoButtons);
+    itemContainer.addEventListener('mouseleave', scheduleHideVideoButtons);
+    itemContainer.taHoverListener = true;
+  }
+
+  return button;
+}
+
+function showVideoButtons(e) {
+  let itemContainer = e.currentTarget;
+  clearTimeout(itemContainer.taHideTimeout);
+  itemContainer.taButtons.forEach(button => {
+    positionVideoButton(button);
+    button.style.display = 'inline-flex';
+    if (!button.isChecked && !button.isChecking) {
+      checkVideoExists(button);
+    }
+  });
+}
+
+function keepVideoButtonsVisible(e) {
+  let itemContainer = e.currentTarget.taItemContainer;
+  clearTimeout(itemContainer.taHideTimeout);
+}
+
+function scheduleHideVideoButtons(e) {
+  let itemContainer = e.currentTarget.taItemContainer || e.currentTarget;
+  clearTimeout(itemContainer.taHideTimeout);
+  itemContainer.taHideTimeout = setTimeout(() => {
+    hideVideoButtons(itemContainer);
+  }, 100);
+}
+
+function hideVideoButtons(itemContainer) {
+  itemContainer.taButtons.forEach(button => {
+    button.style.display = 'none';
+  });
 }
 
 function checkVideoExists(taButton) {
+  taButton.isChecking = true;
+
   function handleResponse(message) {
     let buttonSpan = taButton.querySelector('span') || taButton;
     if (message !== false) {
       buttonSpan.innerHTML = checkmarkIcon;
       buttonSpan.title = 'Open in TA';
-      buttonSpan.addEventListener('click', () => {
-        let win = window.open(message, '_blank');
-        win.focus();
-      });
+      taButton.dataset.taUrl = message;
     } else {
       buttonSpan.innerHTML = downloadIcon;
+      delete taButton.dataset.taUrl;
     }
     taButton.isChecked = true;
+    taButton.isChecking = false;
   }
   function handleError(e) {
     buttonError(taButton);
     let videoId = taButton.dataset.id;
     console.log(`error: failed to get info from TA for video ${videoId}`);
     console.error(e);
+    taButton.isChecking = false;
   }
 
   let videoId = taButton.dataset.id;
   if (!videoId) {
-    videoId = getVideoId(taButton);
-    if (videoId) {
-      taButton.setAttribute('data-id', videoId);
-      taButton.setAttribute('data-type', 'video');
-      taButton.title = `TA download video: ${taButton.parentElement.innerText} [${videoId}]`;
-    }
+    taButton.isChecking = false;
+    return;
   }
 
   let message = { type: 'videoExists', videoId };
@@ -615,3 +680,4 @@ let observer = new MutationObserver(list => {
 });
 
 observer.observe(document.body, { attributes: false, childList: true, subtree: true });
+ensureTALinks();
