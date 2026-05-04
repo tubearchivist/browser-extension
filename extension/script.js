@@ -95,6 +95,11 @@ const videoAnchorSelector = [
   'a.shortsLockupViewModelHostEndpoint.shortsLockupViewModelHostOutsideMetadataEndpoint[href]',
   'a#video-title[href]',
 ].join(', ');
+const channelContainerSelector = [
+  'yt-flexible-actions-view-model.ytPageHeaderViewModelFlexibleActions',
+  '.yt-page-header-view-model__page-header-flexible-actions',
+  '#owner',
+].join(', ');
 
 // boilerplate to dedect browser type api
 function getBrowser() {
@@ -113,9 +118,7 @@ function getBrowser() {
 }
 
 function getChannelContainers() {
-  const elements = document.querySelectorAll(
-     '.yt-page-header-view-model__page-header-flexible-actions, #owner'
-  );
+  const elements = document.querySelectorAll(channelContainerSelector);
   const channelContainerNodes = [];
 
   elements.forEach(element => {
