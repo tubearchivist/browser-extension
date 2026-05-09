@@ -390,6 +390,7 @@ function buildVideoButton(videoId) {
     top: '4px',
     right: '4px',
     zIndex: 1000,
+    boxShadow: '0px 0px 15px 3px #97d4c8',
   });
 
   let dlIcon = document.createElement('span');
