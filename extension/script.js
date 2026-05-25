@@ -528,12 +528,28 @@ function showVideoButtons(e) {
 }
 
 function keepVideoButtonsVisible(e) {
-  let itemContainer = e.currentTarget.taItemContainer;
+  let button = e.currentTarget;
+  let itemContainer = button.taItemContainer;
   clearTimeout(itemContainer.taHideTimeout);
+
+  // reset the intention flag and start a timer
+  button.taIntentionalHover = false;
+  clearTimeout(button.taIntentTimeout);
+  button.taIntentTimeout = setTimeout(() => {
+    button.taIntentionalHover = true;
+  }, 200);
 }
 
 function scheduleHideVideoButtons(e) {
-  let itemContainer = e.currentTarget.taItemContainer || e.currentTarget;
+  let target = e.currentTarget;
+  let itemContainer = target.taItemContainer || target;
+
+  // if we are leaving a button, check if the hover was intentional
+  if (target.taItemContainer) {
+    clearTimeout(target.taIntentTimeout);
+    if (!target.taIntentionalHover) return;
+  }
+
   clearTimeout(itemContainer.taHideTimeout);
   itemContainer.taHideTimeout = setTimeout(() => {
     hideVideoButtons(itemContainer);
