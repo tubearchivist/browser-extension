@@ -118,8 +118,18 @@ function getBrowser() {
   }
 }
 
-function getChannelContainers() {
-  const elements = document.querySelectorAll(channelContainerSelector);
+function getMatchingElements(root, selector) {
+  if (!root || typeof root.querySelectorAll !== 'function') return [];
+
+  const elements = Array.from(root.querySelectorAll(selector));
+  if (typeof root.matches === 'function' && root.matches(selector)) {
+    elements.unshift(root);
+  }
+  return elements;
+}
+
+function getChannelContainers(root = document) {
+  const elements = getMatchingElements(root, channelContainerSelector);
   const channelContainerNodes = [];
 
   elements.forEach(element => {
@@ -135,8 +145,8 @@ function isElementVisible(element) {
   return element.offsetWidth > 0 || element.offsetHeight > 0 || element.getClientRects().length > 0;
 }
 
-function ensureTALinks() {
-  let channelContainerNodes = getChannelContainers();
+function ensureTALinks(root = document) {
+  let channelContainerNodes = getChannelContainers(root);
 
   for (let channelContainer of channelContainerNodes) {
     channelContainer = adjustOwner(channelContainer);
@@ -146,9 +156,8 @@ function ensureTALinks() {
     channelContainer.hasTA = true;
   }
 
-  ensureVideoButtons();
+  ensureVideoButtons(root);
 }
-ensureTALinks = throttled(ensureTALinks, 700);
 
 function adjustOwner(channelContainer) {
   return channelContainer.querySelector('#buttons') || channelContainer;
@@ -460,8 +469,8 @@ function positionVideoButton(button) {
   button.style.right = `${containerRect.right - anchorRect.right + paddingRight + 4}px`;
 }
 
-function ensureVideoButtons() {
-  document.querySelectorAll(videoAnchorSelector).forEach(anchor => {
+function ensureVideoButtons(root = document) {
+  getMatchingElements(root, videoAnchorSelector).forEach(anchor => {
     if (!isElementVisible(anchor)) return;
     if (anchor.closest('.ta-button, .ta-channel-button')) return;
     if (!getVideoIdFromAnchor(anchor)) return;
@@ -678,15 +687,64 @@ function throttled(callback, time) {
   };
 }
 
+const matchingElementSelector = `${channelContainerSelector}, ${videoAnchorSelector}`;
+const pendingTARoots = new Set();
+
+function collapseTARoots(roots) {
+  const rootSet = new Set(roots);
+  if (rootSet.has(document)) return [document];
+
+  return roots.filter(root => {
+    let ancestor = root.parentElement;
+    while (ancestor) {
+      if (rootSet.has(ancestor)) return false;
+      ancestor = ancestor.parentElement;
+    }
+    return true;
+  });
+}
+
+const processPendingTARoots = throttled(() => {
+  const roots = collapseTARoots(Array.from(pendingTARoots));
+  pendingTARoots.clear();
+  roots.forEach(root => ensureTALinks(root));
+}, 700);
+
+function queueTALinks(roots) {
+  roots.forEach(root => {
+    if (root && typeof root.querySelectorAll === 'function') pendingTARoots.add(root);
+  });
+  if (pendingTARoots.size > 0) processPendingTARoots();
+}
+
+function getMutationRoots(list) {
+  const roots = new Set();
+
+  for (const item of list) {
+    if (item.type !== 'childList' || item.addedNodes.length === 0) continue;
+
+    for (const node of item.addedNodes) {
+      if (node.nodeType === 1) roots.add(node);
+    }
+
+    const target = item.target?.nodeType === 1 ? item.target : item.target?.parentElement;
+    const matchingAncestor = target?.closest?.(matchingElementSelector);
+    if (matchingAncestor) roots.add(matchingAncestor);
+  }
+
+  return Array.from(roots);
+}
+
 let observer = new MutationObserver(list => {
   const currentHref = document.location.href;
   if (currentHref !== oldHref) {
     cleanButtons();
     oldHref = currentHref;
+    queueTALinks([document]);
+    return;
   }
-  if (list.some(i => i.type === 'childList' && i.addedNodes.length > 0)) {
-    ensureTALinks();
-  }
+
+  queueTALinks(getMutationRoots(list));
 });
 
 observer.observe(document.body, { attributes: false, childList: true, subtree: true });
