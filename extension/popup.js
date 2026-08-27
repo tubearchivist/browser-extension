@@ -93,6 +93,11 @@ document.getElementById('autostart').addEventListener('click', function () {
   toggleAutostart();
 });
 
+// re-download
+document.getElementById('redownload').addEventListener('click', function () {
+  toggleRedownload();
+});
+
 // fast add
 document.getElementById('fastAdd').addEventListener('click', function () {
   toggleFastAdd();
@@ -171,6 +176,18 @@ function toggleAutostart() {
   let checked = document.getElementById('autostart').checked;
   let toStore = {
     autostart: {
+      checked: checked,
+    },
+  };
+  browserType.storage.local.set(toStore, function () {
+    console.log('stored option: ' + JSON.stringify(toStore));
+  });
+}
+
+function toggleRedownload() {
+  let checked = document.getElementById('redownload').checked;
+  let toStore = {
+    redownload: {
       checked: checked,
     },
   };
@@ -300,6 +317,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('autostart').checked = true;
   }
 
+  async function setRedownloadOption(result) {
+    console.log(result);
+    if (!result.redownload || result.redownload.checked === false) {
+      console.log('redownload not set');
+      return;
+    }
+    console.log('set options: ' + JSON.stringify(result));
+    document.getElementById('redownload').checked = true;
+  }
+
   async function setFastAddOption(result) {
     console.log(result);
     if (!result.fastAdd || result.fastAdd.checked === false) {
@@ -323,6 +350,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   browserType.storage.local.get('autostart', function (result) {
     setAutostartOption(result);
+  });
+  browserType.storage.local.get('redownload', function (result) {
+    setRedownloadOption(result);
   });
   browserType.storage.local.get('fastAdd', function (result) {
     setFastAddOption(result);

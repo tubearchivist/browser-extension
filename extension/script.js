@@ -100,6 +100,7 @@ const channelContainerSelector = [
   'yt-flexible-actions-view-model.ytPageHeaderViewModelFlexibleActions',
   '.yt-page-header-view-model__page-header-flexible-actions',
   '#owner',
+  'ytd-channel-renderer'
 ].join(', ');
 
 // boilerplate to dedect browser type api

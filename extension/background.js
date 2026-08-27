@@ -106,6 +106,11 @@ async function download(url) {
   if (Object.keys(autoStart).length > 0 && autoStart.autostart.checked) {
     searchParams.append('autostart', 'true');
   }
+  const redownload = await browserType.storage.local.get('redownload');
+  if (Object.keys(redownload).length > 0 && redownload.redownload.checked) {
+    // backend query param in TA is called force
+    searchParams.append('force', 'true');
+  }
   const fastAdd = await browserType.storage.local.get('fastAdd');
   if (Object.keys(fastAdd).length > 0 && fastAdd.fastAdd.checked) {
     // backend query param in TA is called flat
